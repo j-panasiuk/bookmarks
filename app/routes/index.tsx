@@ -1,32 +1,33 @@
-export default function Index() {
+import { useLoaderData } from "@remix-run/react";
+import { readFile } from "~/utils/readFile";
+
+export async function loader() {
+  if (!process.env.BOOKMARKS_FILE_PATH) {
+    throw new Error('Missing env variable "BOOKMARKS_FILE_PATH"');
+  }
+
+  const url = process.env.HOME + process.env.BOOKMARKS_FILE_PATH;
+  const html = await readFile(url);
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/plain",
+    },
+  });
+}
+
+export default function IndexRoute() {
+  const html = useLoaderData<typeof loader>();
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
+    <main className="w-full min-h-screen p-4">
+      {html ? <div dangerouslySetInnerHTML={{ __html: html }} /> : null}
+    </main>
   );
+}
+
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.warn(error);
+  return <div>Something went wrong</div>;
 }
