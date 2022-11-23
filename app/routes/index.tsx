@@ -1,4 +1,5 @@
 import { useLoaderData } from "@remix-run/react";
+import { getBookmarkTree } from "~/models/bookmark";
 import { readFile } from "~/utils/readFile";
 
 export async function loader() {
@@ -19,6 +20,12 @@ export async function loader() {
 
 export default function IndexRoute() {
   const html = useLoaderData<typeof loader>();
+
+  if (typeof DOMParser !== "undefined") {
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    const tree = getBookmarkTree(dom);
+    console.log(tree);
+  }
 
   return (
     <main className="w-full min-h-screen p-4">
