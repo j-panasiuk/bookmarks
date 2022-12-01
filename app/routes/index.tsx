@@ -1,24 +1,19 @@
+import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import { Fallback } from "~/components/fallback";
-import { getBookmarkTree } from "~/models/bookmark";
-import { readFile } from "~/utils/readFile";
+import { parseBookmarks, parseFolders } from "~/models/bookmark.server";
+import { getFilePath, readFile } from "~/utils/file";
 
 export async function loader() {
-  if (!process.env.BOOKMARKS_FILE_PATH) {
-    throw new Response('Missing env variable "BOOKMARKS_FILE_PATH"', {
-      status: 404,
-    });
-  }
-
   try {
-    const html = await readFile(process.env.BOOKMARKS_FILE_PATH);
-  return new Response(html, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/plain",
-    },
-  });
+    const path = getFilePath();
+    const html = await readFile(path);
+    const bookmarks = parseBookmarks(html);
+    const folders = parseFolders(html);
+
+    return json({ bookmarks, folders });
   } catch (err) {
+    console.log("err", err);
     throw new Response(
       err instanceof Error ? err.message : "Could not read bookmarks file",
       { status: 404 }
@@ -27,17 +22,32 @@ export async function loader() {
 }
 
 export default function IndexRoute() {
-  const html = useLoaderData<typeof loader>();
-
-  if (typeof DOMParser !== "undefined") {
-    const dom = new DOMParser().parseFromString(html, "text/html");
-    const tree = getBookmarkTree(dom);
-    console.log(tree);
-  }
+  const { bookmarks, folders } = useLoaderData<typeof loader>();
 
   return (
-    <main className="w-full min-h-screen p-4">
-      {html ? <div dangerouslySetInnerHTML={{ __html: html }} /> : null}
+    <main className="w-full min-h-screen p-2 grid grid-cols-2 gap-2">
+      <div className="h-full bg-slate-200">
+        <h2>FOLDERS</h2>
+        <hr />
+        <div>
+          {folders.map((folder, index) => (
+            <p key={folder.title + index}>
+              {folder.title} ({folder.folders.join("/")})
+            </p>
+          ))}
+        </div>
+      </div>
+      <div className="h-full bg-slate-100">
+        <h2>BOOKMARKS</h2>
+        <hr />
+        <div>
+          {bookmarks.map((bookmark, index) => (
+            <p key={bookmark.href + index}>
+              {bookmark.title} ({bookmark.folders.join("/")})
+            </p>
+          ))}
+        </div>
+      </div>
     </main>
   );
 }
