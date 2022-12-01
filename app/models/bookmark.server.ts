@@ -1,10 +1,10 @@
-import { load } from "cheerio";
-import type { Bookmark } from "./bookmark";
+import { load, Cheerio, Element } from "cheerio";
+import type { Bookmark, BookmarkFolder } from "./bookmark";
 
 export function parseBookmarks(html: string): Bookmark[] {
   const $ = load(html);
 
-  const getParentFolderNames = ($a: ReturnType<typeof $>): string[] => {
+  const getParentFolderNames = ($a: Cheerio<Element>): string[] => {
     const $dl = $a.closest("dl").prev();
     const currentFolderName = $dl.text();
     return $dl.length > 0
