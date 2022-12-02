@@ -3,7 +3,7 @@ import { useCatch, useLoaderData } from "@remix-run/react";
 import { Bookmarks } from "~/components/bookmarks";
 import { Fallback } from "~/components/fallback";
 import { Folders } from "~/components/folders";
-import { parseBookmarks, parseFolders } from "~/models/bookmark.server";
+import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
 import { getFilePath, readFile } from "~/utils/file";
 
 export async function loader() {
@@ -11,7 +11,7 @@ export async function loader() {
     const path = getFilePath();
     const html = await readFile(path);
     const bookmarks = parseBookmarks(html);
-    const folders = parseFolders(html);
+    const folders = parseFolderTree(html);
 
     return json({ bookmarks, folders });
   } catch (err) {

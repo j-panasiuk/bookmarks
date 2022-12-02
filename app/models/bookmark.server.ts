@@ -1,5 +1,6 @@
 import { load, Cheerio, Element } from "cheerio";
 import type { Bookmark, Folder } from "./bookmark";
+import { buildTree } from "./folderTree";
 
 export function parseBookmarks(html: string): Bookmark[] {
   const $ = load(html);
@@ -19,10 +20,10 @@ export function parseBookmarks(html: string): Bookmark[] {
   return bookmarks;
 }
 
-export function parseFolders(html: string): Folder<Folder>[] {
+export function parseFolders(html: string): Folder[] {
   const $ = load(html);
 
-  let folders: Folder<Folder>[] = [];
+  let folders: Folder[] = [];
 
   $("h3").each((_, el) => {
     let $h3 = $(el);
@@ -34,6 +35,10 @@ export function parseFolders(html: string): Folder<Folder>[] {
   });
 
   return folders;
+}
+
+export function parseFolderTree(html: string): Folder<Folder>[] {
+  return buildTree(parseFolders(html));
 }
 
 // --- HELPERS ---
