@@ -7,7 +7,8 @@
     "dev:css": "npm run generate:css -- --watch",
     "dev:remix": "remix dev",
     "generate:css": "tailwindcss -o ./app/root.css",
-    "start": "remix-serve build"
+    "start": "remix-serve build",
+    "test": "vitest"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.4",
@@ -29,7 +30,9 @@
     "eslint": "^8.27.0",
     "npm-run-all": "^4.1.5",
     "tailwindcss": "^3.2.4",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "vite-tsconfig-paths": "^3.6.0",
+    "vitest": "^0.25.3"
   },
   "engines": {
     "node": ">=16"
