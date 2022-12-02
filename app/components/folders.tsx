@@ -11,7 +11,7 @@ export function Folders({ folders }: Props) {
       {folders.map((folder, index) => (
         <p key={folder.title + index} className="flex">
           <FolderIcon className="w-6 h-6" />
-          {folder.title} ({folder.folders.join("/")})
+          {folder.title} ({folder.parentFolders.join("/")})
         </p>
       ))}
     </div>

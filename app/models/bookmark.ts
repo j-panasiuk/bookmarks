@@ -5,7 +5,7 @@ export type BookmarkFolder = {
    * Names of parent folders, following the nesting order
    * @example ["recipes", "italian"]
    * */
-  folders: string[];
+  parentFolders: string[];
   title: string;
   children: BookmarkTree;
 };
@@ -15,7 +15,7 @@ export type Bookmark = {
    * Names of parent folders, following the nesting order
    * @example ["recipes", "italian", "pizza"]
    * */
-  folders: string[];
+  parentFolders: string[];
   title: string;
   href: string;
   /** Base 64 icon data */
@@ -33,7 +33,7 @@ export type Bookmark = {
  * type FolderNestedWithBookmarks = Folder<Folder<Bookmark> | Bookmark>;
  */
 export type Folder<T = unknown> = {
-  folders: string[];
+  parentFolders: string[];
   title: string;
   children: T[];
 };

@@ -10,7 +10,7 @@ export function Bookmarks({ bookmarks }: Props) {
       {bookmarks.map((bookmark, index) => (
         <p key={bookmark.title + index} className="flex">
           <img src={bookmark.icon ?? undefined} className="w-6 h-6" />
-          {bookmark.title} ({bookmark.folders.join("/")})
+          {bookmark.title} ({bookmark.parentFolders.join("/")})
         </p>
       ))}
     </div>

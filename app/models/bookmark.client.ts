@@ -24,7 +24,7 @@ export function getBookmarkTree(dom: Document): BookmarkTree {
 
 function parseBookmark(a: HTMLAnchorElement): Bookmark {
   return {
-    folders: [], // TODO
+    parentFolders: [], // TODO
     title: a.innerText,
     href: a.href,
     icon: a.getAttribute("icon"),
@@ -36,7 +36,7 @@ function parseBookmarkFolder(
   dl: HTMLDListElement
 ): BookmarkFolder {
   return {
-    folders: [], // TODO
+    parentFolders: [], // TODO
     title: h.innerText,
     children: parseBookmarkTree(dl),
   };
