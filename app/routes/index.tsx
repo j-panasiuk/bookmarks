@@ -3,6 +3,7 @@ import { useCatch, useLoaderData } from "@remix-run/react";
 import { Bookmarks } from "~/components/bookmarks";
 import { Fallback } from "~/components/fallback";
 import { Folders } from "~/components/folders";
+import { Layout } from "~/components/layout";
 import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
 import { getFilePath, readFile } from "~/utils/file";
 
@@ -27,16 +28,12 @@ export default function IndexRoute() {
   const { bookmarks, folders } = useLoaderData<typeof loader>();
 
   return (
-    <main className="w-full min-h-screen p-2 grid grid-cols-2 gap-2">
-      <div className="h-full bg-slate-200">
-        <h2>FOLDERS</h2>
-        <Folders folders={folders} />
-      </div>
-      <div className="h-full bg-slate-100">
-        <h2>BOOKMARKS</h2>
-        <Bookmarks bookmarks={bookmarks} />
-      </div>
-    </main>
+    <Layout
+      header={<>Bookmarks</>}
+      nav={<Folders folders={folders} />}
+      main={<Bookmarks bookmarks={bookmarks} />}
+      aside={<></>}
+    />
   );
 }
 
