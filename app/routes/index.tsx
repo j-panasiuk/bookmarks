@@ -1,9 +1,11 @@
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import { Bookmarks } from "~/components/bookmarks";
 import { Fallback } from "~/components/fallback";
 import { Folders } from "~/components/folders";
 import { Layout } from "~/components/layout";
+import { Folder } from "~/models/bookmark";
 import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
 import { getFilePath, readFile } from "~/utils/file";
 
@@ -26,12 +28,19 @@ export async function loader() {
 
 export default function IndexRoute() {
   const { bookmarks, folders } = useLoaderData<typeof loader>();
+  const [currentFolder, setCurrentFolder] = useState<Folder>();
 
   return (
     <Layout
       header={<>Bookmarks</>}
-      nav={<Folders folders={folders} />}
-      main={<Bookmarks bookmarks={bookmarks} />}
+      nav={
+        <Folders
+          folders={folders}
+          currentFolder={currentFolder}
+          setCurrentFolder={setCurrentFolder}
+        />
+      }
+      main={<Bookmarks bookmarks={bookmarks} currentFolder={currentFolder} />}
       aside={<></>}
     />
   );

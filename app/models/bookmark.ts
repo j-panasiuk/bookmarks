@@ -37,3 +37,46 @@ export type Folder<T = unknown> = {
   title: string;
   children: T[];
 };
+
+/**
+ * Check if the second folder is same as the first one.
+ * Compare folder location and names only.
+ * @example
+ * isSameAs(A)(A) // true
+ * isSameAs(A)(B) // false
+ * isSameAs(A)(A/B) // false
+ * isSameAs(A)(B/A) // false
+ */
+export const isSameAs =
+  (f1: Folder) =>
+  (f2: Folder): boolean => {
+    return getFolderPath(f1) === getFolderPath(f2);
+  };
+
+/**
+ * Check if the second item is inside the first folder.
+ * A folder is not considered to be inside itself :)
+ * Works for folders and bookmarks.
+ * @example
+ * isInside(A)(B) // false
+ * isInside(A)(A) // false
+ * isInside(A)(A/1) // true
+ * isInside(A)(A/1/a) // true
+ */
+export const isInside =
+  (folder: Folder) =>
+  (item: { parentFolders: string[] }): boolean => {
+    return getParentFolderPath(item).startsWith(getFolderPath(folder));
+  };
+
+function getFolderPath(folder: Folder): string {
+  return getPath(folder.parentFolders.concat(folder.title));
+}
+
+function getParentFolderPath(item: { parentFolders: string[] }): string {
+  return getPath(item.parentFolders);
+}
+
+function getPath(paths: string[]): string {
+  return paths.join("/");
+}
