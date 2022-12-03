@@ -77,6 +77,6 @@ function getParentFolderPath(item: { parentFolders: string[] }): string {
   return getPath(item.parentFolders);
 }
 
-function getPath(paths: string[]): string {
+export function getPath(paths: string[]): string {
   return paths.join("/");
 }

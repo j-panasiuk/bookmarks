@@ -1,5 +1,5 @@
 import { by, splitBy } from "~/utils/array";
-import type { Folder } from "./bookmark";
+import { Folder, getPath } from "./bookmark";
 
 /**
  * Given flat folder list return a tree structure.
@@ -39,10 +39,11 @@ function getFolderLevel(folder: Folder): number {
  */
 export const splitByParentPath = (level: number) => {
   return splitBy((f: Folder): string => {
-    const parentPath =
+    const parentPath = getPath(
       f.parentFolders.length === level
-        ? f.parentFolders.concat(f.title).join("/")
-        : f.parentFolders.slice(0, 1 + level).join("/");
+        ? f.parentFolders.concat(f.title)
+        : f.parentFolders.slice(0, 1 + level)
+    );
 
     return parentPath;
   });
