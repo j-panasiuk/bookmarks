@@ -12,6 +12,7 @@ export function FoldersNav(props: Props) {
     <>
       <h2 onClick={() => props.setCurrentFolder(undefined)}>Folders</h2>
       <Folders level={0} {...props} />
+      <pre>{JSON.stringify(props.currentFolder, null, 2)}</pre>
     </>
   );
 }
@@ -27,10 +28,15 @@ export function Folders({
   currentFolder,
 }: TreeProps) {
   return (
-    <div className={level === 0 ? "ml-0" : "ml-4"}>
+    <div className={level === 0 ? undefined : "ml-4"}>
       {folders.map((folder, index) => (
         <div key={folder.title + index}>
-          <p onClick={() => setCurrentFolder(folder)} className="flex">
+          <p
+            onClick={() => setCurrentFolder(folder)}
+            className={"flex".concat(
+              isFolderSelected(folder, currentFolder) ? " bg-gray-100" : ""
+            )}
+          >
             {isFolderOpen(folder, currentFolder) ? (
               <FolderOpenIcon className="w-6 h-6 mx-2" />
             ) : (
@@ -46,13 +52,16 @@ export function Folders({
           />
         </div>
       ))}
-      <pre>{JSON.stringify(currentFolder, null, 2)}</pre>
     </div>
   );
 }
 
+function isFolderSelected(folder: Folder, currentFolder?: Folder): boolean {
+  return currentFolder ? isSameAs(currentFolder)(folder) : false;
+}
+
 function isFolderOpen(folder: Folder, currentFolder?: Folder): boolean {
   return currentFolder
-    ? isSameAs(currentFolder)(folder) || isInside(currentFolder)(folder)
+    ? isSameAs(currentFolder)(folder) || isInside(folder)(currentFolder)
     : false;
 }
