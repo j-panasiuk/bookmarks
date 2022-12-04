@@ -30,11 +30,18 @@ const bA1a: Bookmark = {
 describe("isSameAs", () => {
   it("returns true if given the same folder (compare by location and title)", () => {
     expect(isSameAs(A)({ ...A })).toBe(true);
-    expect(isSameAs(A)({ ...A, children: [777] })).toBe(true);
+    expect(isSameAs(A)({ ...A, children: [777] } as Folder)).toBe(true);
     expect(isSameAs(A)(B)).toBe(false);
     expect(isSameAs(A)(A1)).toBe(false);
     expect(isSameAs(A1)(A2)).toBe(false);
     expect(isSameAs(A1)(A1a)).toBe(false);
+  });
+  it("returns true if given the same file (compare by location and title)", () => {
+    expect(isSameAs(b)({ ...b })).toBe(true);
+    expect(isSameAs(b)({ ...b, href: "/xyz" } as Bookmark)).toBe(true);
+    expect(isSameAs(b)(bA)).toBe(false);
+    expect(isSameAs(b)(bA1)).toBe(false);
+    expect(isSameAs(b)(bA1a)).toBe(false);
   });
 });
 

@@ -1,11 +1,11 @@
-type CompareFn<T> = (a: T, b: T) => -1 | 0 | 1;
+import type { Order, MapFn } from "~/utils/fn";
 
 /**
  * Helper function for sorting arrays.
  * @example
  * ["aa", "", "a"].sort(by(s => s.length)) // ["", "a", "aa"]
  */
-export function by<T = unknown>(evaluate: (el: T) => number): CompareFn<T> {
+export function by<T = unknown>(evaluate: (el: T) => number): Order<T> {
   return function compareFn(a, b) {
     const aval = evaluate(a);
     const bval = evaluate(b);
@@ -15,15 +15,13 @@ export function by<T = unknown>(evaluate: (el: T) => number): CompareFn<T> {
   };
 }
 
-type BucketFn<K, T = unknown> = (a: T) => K;
-
 /**
  * Split array into buckets.
  * Preserves order of elements.
  * @example
  * splitBy(s => s.length)(["aa", "a", "b"]) // [["aa"], ["a", "a"]]
  */
-export function splitBy<K, T>(bucketFn: BucketFn<K, T>) {
+export function splitBy<K, T>(bucketFn: MapFn<T, K>) {
   return function splitFn(array: T[]) {
     const buckets = new Map<K, T[]>();
     for (const el of array) {

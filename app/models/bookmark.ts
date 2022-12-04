@@ -1,3 +1,5 @@
+import type { Eq2 } from "~/utils/fn";
+
 export type BookmarkTree = (BookmarkFolder | Bookmark)[];
 
 export type BookmarkFolder = {
@@ -38,20 +40,25 @@ export type Folder<T = unknown> = {
   children: T[];
 };
 
+// Folder or Bookmark
+interface Item {
+  parentFolders: string[];
+  title: string;
+}
+
 /**
- * Check if the second folder is same as the first one.
+ * Check if the second item is same as the first one.
  * Compare folder location and names only.
+ * Works for folders and bookmarks.
  * @example
  * isSameAs(A)(A) // true
  * isSameAs(A)(B) // false
  * isSameAs(A)(A/B) // false
  * isSameAs(A)(B/A) // false
  */
-export const isSameAs =
-  (f1: Folder) =>
-  (f2: Folder): boolean => {
-    return getFolderPath(f1) === getFolderPath(f2);
-  };
+export const isSameAs: Eq2<Item> = (item1) => (item2) => {
+  return getItemPath(item1) === getItemPath(item2);
+};
 
 /**
  * Check if the second item is inside the first folder.
@@ -65,15 +72,15 @@ export const isSameAs =
  */
 export const isInside =
   (folder: Folder) =>
-  (item: { parentFolders: string[] }): boolean => {
-    return getParentFolderPath(item).startsWith(getFolderPath(folder));
+  (item: Item): boolean => {
+    return getParentFolderPath(item).startsWith(getItemPath(folder));
   };
 
-function getFolderPath(folder: Folder): string {
-  return getPath(folder.parentFolders.concat(folder.title));
+function getItemPath(item: Item): string {
+  return getPath(item.parentFolders.concat(item.title));
 }
 
-function getParentFolderPath(item: { parentFolders: string[] }): string {
+function getParentFolderPath(item: Item): string {
   return getPath(item.parentFolders);
 }
 
