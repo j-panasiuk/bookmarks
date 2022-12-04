@@ -2,12 +2,14 @@ import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { Bookmarks } from "~/components/bookmarks";
+import { BookmarkSelection } from "~/components/bookmarkSelection";
 import { Fallback } from "~/components/fallback";
 import { Folders } from "~/components/folders";
 import { Layout } from "~/components/layout";
-import { Folder } from "~/models/bookmark";
+import { Bookmark, Folder, isSameAs } from "~/models/bookmark";
 import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
 import { getFilePath, readFile } from "~/utils/file";
+import { useSelection } from "~/utils/selection";
 
 export async function loader() {
   try {
@@ -29,6 +31,9 @@ export async function loader() {
 export default function IndexRoute() {
   const { bookmarks, folders } = useLoaderData<typeof loader>();
   const [currentFolder, setCurrentFolder] = useState<Folder>();
+  const [selectedBookmarks, selectionActions] = useSelection<Bookmark>({
+    eq: isSameAs,
+  });
 
   return (
     <Layout
@@ -40,8 +45,19 @@ export default function IndexRoute() {
           setCurrentFolder={setCurrentFolder}
         />
       }
-      main={<Bookmarks bookmarks={bookmarks} currentFolder={currentFolder} />}
-      aside={<></>}
+      main={
+        <Bookmarks
+          bookmarks={bookmarks}
+          currentFolder={currentFolder}
+          {...selectionActions}
+        />
+      }
+      aside={
+        <BookmarkSelection
+          selectedBookmarks={selectedBookmarks}
+          {...selectionActions}
+        />
+      }
     />
   );
 }
