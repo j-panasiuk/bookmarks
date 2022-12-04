@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Bookmarks } from "~/components/bookmarks";
 import { BookmarkSelection } from "~/components/bookmarkSelection";
 import { Fallback } from "~/components/fallback";
-import { Folders } from "~/components/folders";
+import { FoldersNav } from "~/components/folders";
 import { Layout } from "~/components/layout";
 import { Bookmark, Folder, isSameAs } from "~/models/bookmark";
 import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
@@ -39,7 +39,7 @@ export default function IndexRoute() {
     <Layout
       header={<>Bookmarks</>}
       nav={
-        <Folders
+        <FoldersNav
           folders={folders}
           currentFolder={currentFolder}
           setCurrentFolder={setCurrentFolder}

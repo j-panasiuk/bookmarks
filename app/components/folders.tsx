@@ -7,23 +7,44 @@ type Props = {
   currentFolder?: Folder;
 };
 
-export function Folders({ folders, setCurrentFolder, currentFolder }: Props) {
+export function FoldersNav(props: Props) {
   return (
-    <div>
-      <h2 onClick={() => setCurrentFolder(undefined)}>Folders</h2>
+    <>
+      <h2 onClick={() => props.setCurrentFolder(undefined)}>Folders</h2>
+      <Folders level={0} {...props} />
+    </>
+  );
+}
+
+interface TreeProps extends Props {
+  level: number;
+}
+
+export function Folders({
+  level,
+  folders,
+  setCurrentFolder,
+  currentFolder,
+}: TreeProps) {
+  return (
+    <div className={level === 0 ? "ml-0" : "ml-4"}>
       {folders.map((folder, index) => (
-        <p
-          key={folder.title + index}
-          onClick={() => setCurrentFolder(folder)}
-          className="flex"
-        >
-          {isFolderOpen(folder, currentFolder) ? (
-            <FolderOpenIcon className="w-6 h-6" />
-          ) : (
-            <FolderIcon className="w-6 h-6" />
-          )}
-          {folder.title} ({folder.parentFolders.join("/")})
-        </p>
+        <div key={folder.title + index}>
+          <p onClick={() => setCurrentFolder(folder)} className="flex">
+            {isFolderOpen(folder, currentFolder) ? (
+              <FolderOpenIcon className="w-6 h-6 mx-2" />
+            ) : (
+              <FolderIcon className="w-6 h-6 mx-2" />
+            )}
+            {folder.title}
+          </p>
+          <Folders
+            level={level + 1}
+            folders={folder.children as Folder<Folder>[]}
+            setCurrentFolder={setCurrentFolder}
+            currentFolder={currentFolder}
+          />
+        </div>
       ))}
       <pre>{JSON.stringify(currentFolder, null, 2)}</pre>
     </div>
