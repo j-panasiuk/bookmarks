@@ -8,13 +8,12 @@ import { FoldersNav } from "~/components/folders";
 import { Layout } from "~/components/layout";
 import { Bookmark, Folder, isSameAs } from "~/models/bookmark";
 import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
-import { getFilePath, readFile } from "~/utils/file";
 import { useSelection } from "~/utils/selection";
+import { readBookmarksFile } from "./index.utils";
 
 export async function loader() {
   try {
-    const path = getFilePath();
-    const html = await readFile(path);
+    const html = await readBookmarksFile();
     const bookmarks = parseBookmarks(html);
     const folders = parseFolderTree(html);
 

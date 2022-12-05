@@ -17,7 +17,7 @@ export function Bookmarks({
     : bookmarks;
 
   return (
-    <div>
+    <>
       <h2>Bookmarks</h2>
       {currentFolderBookmarks.map((bookmark, index) => (
         <p
@@ -29,6 +29,6 @@ export function Bookmarks({
           {bookmark.title} ({bookmark.parentFolders.join("/")})
         </p>
       ))}
-    </div>
+    </>
   );
 }
