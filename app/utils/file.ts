@@ -10,8 +10,3 @@ export async function writeTextFile(
 ): Promise<void> {
   return writeFile(path, content);
 }
-
-
-export function getFilePath(): string {
-  return process.env.BOOKMARKS_FILE_PATH || join(__dirname, DEFAULT_PATH);
-}

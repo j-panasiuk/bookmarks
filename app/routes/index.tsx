@@ -3,6 +3,7 @@ import { useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { Bookmarks } from "~/components/bookmarks";
 import { BookmarkSelection } from "~/components/bookmarkSelection";
+import { Breadcrumbs } from "~/components/breadcrumbs";
 import { Fallback } from "~/components/fallback";
 import { FoldersNav } from "~/components/folders";
 import { Layout } from "~/components/layout";
@@ -36,7 +37,7 @@ export default function IndexRoute() {
 
   return (
     <Layout
-      header={<>Bookmarks</>}
+      header={<Breadcrumbs currentFolder={currentFolder} />}
       nav={
         <FoldersNav
           folders={folders}
