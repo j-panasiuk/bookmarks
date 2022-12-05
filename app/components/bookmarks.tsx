@@ -1,4 +1,4 @@
-import { Bookmark, Folder, isInside } from "~/models/bookmark";
+import { Bookmark, Folder, getItemPath, isInside } from "~/models/bookmark";
 import { SelectionActions } from "~/utils/selection";
 
 interface Props extends SelectionActions<Bookmark> {
@@ -18,7 +18,12 @@ export function Bookmarks({
 
   return (
     <>
-      <h2>Bookmarks</h2>
+      <div className="flex justify-between">
+        <h2>/{currentFolder ? getItemPath(currentFolder) : undefined}</h2>
+        <button onClick={() => select(currentFolderBookmarks)}>
+          Select all
+        </button>
+      </div>
       {currentFolderBookmarks.map((bookmark, index) => (
         <p
           key={bookmark.title + index}

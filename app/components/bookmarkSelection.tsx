@@ -11,7 +11,11 @@ export function BookmarkSelection({ selectedBookmarks, reset }: Props) {
 
   return (
     <>
-      <h2 onClick={reset}>Selected Bookmarks</h2>
+      <div className="flex justify-between">
+        <h2>Selected</h2>
+        <button onClick={reset}>Clear</button>
+      </div>
+
       {selectedBookmarks.map((bookmark, index) => (
         <p key={bookmark.title + index} className="flex">
           {bookmark.title} ({bookmark.href})

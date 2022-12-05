@@ -76,7 +76,7 @@ export const isInside =
     return getParentFolderPath(item).startsWith(getItemPath(folder));
   };
 
-function getItemPath(item: Item): string {
+export function getItemPath(item: Item): string {
   return getPath(item.parentFolders.concat(item.title));
 }
 
