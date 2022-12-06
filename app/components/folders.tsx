@@ -1,4 +1,10 @@
-import { FolderIcon, FolderOpenIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  FolderIcon,
+  FolderOpenIcon,
+} from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { Folder, isInside, isSameAs } from "~/models/bookmark";
 import { classes as c } from "~/utils/classes";
 
@@ -9,21 +15,41 @@ type Props = {
 };
 
 export function FoldersNav(props: Props) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <>
-      <h2 onClick={() => props.setCurrentFolder(undefined)}>Folders</h2>
-      <Folders level={0} {...props} />
-      <pre>{JSON.stringify(props.currentFolder, null, 2)}</pre>
+      <div className={c("mb-1.5", "flex")}>
+        <h2 className={c("text-sm font-semibold text-slate-500", "flex-1")}>
+          FOLDERS
+        </h2>
+        <button onClick={() => setIsExpanded(true)}>
+          <ChevronDownIcon
+            aria-hidden
+            className={c("w-5 h-5 stroke-slate-400 hover:stroke-slate-600")}
+          />
+        </button>
+        <button onClick={() => setIsExpanded(false)}>
+          <ChevronUpIcon
+            aria-hidden
+            className={c("w-5 h-5 stroke-slate-400 hover:stroke-slate-600")}
+          />
+        </button>
+      </div>
+
+      <Folders level={0} isExpanded={isExpanded} {...props} />
     </>
   );
 }
 
 interface TreeProps extends Props {
   level: number;
+  isExpanded: boolean;
 }
 
 export function Folders({
   level,
+  isExpanded,
   folders,
   setCurrentFolder,
   currentFolder,
@@ -37,27 +63,30 @@ export function Folders({
 
         return (
           <li key={folder.title + index}>
-          <p
-            onClick={() => setCurrentFolder(folder)}
+            <div
+              onClick={() => setCurrentFolder(folder)}
               className={c(
-                "flex items-center rounded-md py-1 px-1.5",
-                isSelected ? "bg-indigo-600 text-white" : ""
-            )}
-          >
+                "flex items-center rounded-md py-1 px-1.5 select-none",
+                isSelected ? "bg-indigo-600 text-white" : "hover:bg-slate-100"
+              )}
+            >
               <Icon
                 className={c(
                   "w-5 h-5 mr-2.5 flex-none stroke-2",
                   isSelected ? "stroke-white" : "stroke-slate-400"
-            )}
+                )}
               />
-            {folder.title}
-          </p>
-          <Folders
-            level={level + 1}
-            folders={folder.children as Folder<Folder>[]}
-            setCurrentFolder={setCurrentFolder}
-            currentFolder={currentFolder}
-          />
+              {folder.title}
+            </div>
+            {isExpanded || isOpen ? (
+              <Folders
+                level={level + 1}
+                isExpanded={isExpanded}
+                folders={folder.children as Folder<Folder>[]}
+                setCurrentFolder={setCurrentFolder}
+                currentFolder={currentFolder}
+              />
+            ) : null}
           </li>
         );
       })}
