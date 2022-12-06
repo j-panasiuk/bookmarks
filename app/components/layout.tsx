@@ -13,22 +13,23 @@ export function Layout({ header, nav, main, aside }: Props) {
       <div
         className={c(
           "flex flex-1 items-center justify-between",
-          "h-16 pr-4 mx-auto",
-          "border-b border-gray-200"
+          "h-app/header pr-4 mx-auto",
+          "border-b border-gray-200",
+          "todo"
         )}
       >
         {header}
       </div>
 
-      <div className={c("mx-auto", "lg:grid lg:grid-cols-12")}>
+      <div className={c("mx-auto h-app/main", "lg:grid lg:grid-cols-12")}>
         <div className={c("hidden", "lg:col-span-3 lg:block", "xl:col-span-3")}>
           <nav
             aria-label="Sidebar"
             className={c(
               "sticky top-0",
-              "max-h-screen", // TODO there is some offset because of top header
-              "overflow-y-auto",
-              "py-3 px-3.5"
+              "h-max-full overflow-y-auto",
+              "py-3 px-3.5",
+              "border-r border-gray-200"
             )}
           >
             {nav}
@@ -37,8 +38,9 @@ export function Layout({ header, nav, main, aside }: Props) {
 
         <main
           className={c(
-            "bg-slate-100",
+            "h-max-full overflow-y-auto",
             "py-3 px-3.5",
+            "bg-slate-100",
             "lg:col-span-9",
             "xl:col-span-6"
           )}
@@ -46,7 +48,14 @@ export function Layout({ header, nav, main, aside }: Props) {
           {main}
         </main>
 
-        <aside className={c("hidden", "lg:col-span-3 lg:block")}>
+        <aside
+          className={c(
+            "hidden border-l border-gray-200",
+            "bg-slate-100",
+            "lg:col-span-3 lg:block",
+            "todo"
+          )}
+        >
           <div className={c("sticky top-4 space-y-4")}>{aside}</div>
         </aside>
       </div>
