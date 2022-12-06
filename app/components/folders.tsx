@@ -1,5 +1,6 @@
 import { FolderIcon, FolderOpenIcon } from "@heroicons/react/24/outline";
 import { Folder, isInside, isSameAs } from "~/models/bookmark";
+import { classes as c } from "~/utils/classes";
 
 type Props = {
   folders: Folder<Folder>[];
@@ -28,20 +29,27 @@ export function Folders({
   currentFolder,
 }: TreeProps) {
   return (
-    <div className={level === 0 ? undefined : "ml-4"}>
-      {folders.map((folder, index) => (
-        <div key={folder.title + index}>
+    <ul className={c(level === 0 ? undefined : "ml-4")}>
+      {folders.map((folder, index) => {
+        const isOpen = isFolderOpen(folder, currentFolder);
+        const isSelected = isFolderSelected(folder, currentFolder);
+        const Icon = isOpen ? FolderOpenIcon : FolderIcon;
+
+        return (
+          <li key={folder.title + index}>
           <p
             onClick={() => setCurrentFolder(folder)}
-            className={"flex".concat(
-              isFolderSelected(folder, currentFolder) ? " bg-gray-100" : ""
+              className={c(
+                "flex items-center rounded-md py-1 px-1.5",
+                isSelected ? "bg-indigo-600 text-white" : ""
             )}
           >
-            {isFolderOpen(folder, currentFolder) ? (
-              <FolderOpenIcon className="w-6 h-6 mx-2" />
-            ) : (
-              <FolderIcon className="w-6 h-6 mx-2" />
+              <Icon
+                className={c(
+                  "w-5 h-5 mr-2.5 flex-none stroke-2",
+                  isSelected ? "stroke-white" : "stroke-slate-400"
             )}
+              />
             {folder.title}
           </p>
           <Folders
@@ -50,9 +58,10 @@ export function Folders({
             setCurrentFolder={setCurrentFolder}
             currentFolder={currentFolder}
           />
-        </div>
-      ))}
-    </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
