@@ -25,9 +25,12 @@ export function useSelection<T = unknown>(options?: Partial<Options<T>>) {
       const isSameElement = eq(element);
       return selected.some(isSameElement);
     },
-    [eq]
+    [eq, selected]
   );
 
+  // TODO split `select` into `select` (additive) and `toggle`.
+  // We could use a second param to specify select/deselect/toggle behavior,
+  // but that would make api be less obvious.
   const select = useCallback(
     (nextSelection: T | T[]) => {
       if (Array.isArray(nextSelection)) {
@@ -50,9 +53,25 @@ export function useSelection<T = unknown>(options?: Partial<Options<T>>) {
     [eq]
   );
 
+  const deselect = useCallback(
+    (nextSelection: T | T[]) => {
+      const elementsToRemove = Array.isArray(nextSelection)
+        ? nextSelection
+        : [nextSelection];
+      const shouldRemove = (element: T) => {
+        const isSameElement = eq(element);
+        return Boolean(elementsToRemove.find(isSameElement));
+      };
+      setSelected((currentSelection) =>
+        currentSelection.filter(not(shouldRemove))
+      );
+    },
+    [eq]
+  );
+
   const reset = useCallback(() => {
     setSelected([]);
   }, []);
 
-  return [selected, { select, reset, isSelected }] as const;
+  return [selected, { select, deselect, reset, isSelected }] as const;
 }

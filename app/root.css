@@ -760,6 +760,10 @@ select {
   margin-top: -1.5rem;
 }
 
+.mb-px {
+  margin-bottom: 1px;
+}
+
 .block {
   display: block;
 }
@@ -1155,6 +1159,16 @@ select {
 .hover\:bg-indigo-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(238 242 255 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-900:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 
 .hover\:stroke-slate-600:hover {

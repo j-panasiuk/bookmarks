@@ -101,8 +101,6 @@ export default function IndexRoute() {
 function WelcomeScreen() {
   const action = useActionData();
 
-  console.log("action2", action);
-
   return (
     <div className={c("min-h-screen bg-indigo-100")}>
       <div className={c("mx-auto max-w-7xl py-16 px-4", "sm:px-6", "lg:px-8")}>
@@ -132,7 +130,6 @@ function WelcomeScreen() {
                 )}
               >
                 <span className="block">Welcome to Bookmarks App</span>
-                {/* <span className="block">Start your free trial today.</span> */}
               </h2>
               <p className={c("mt-4 text-lg leading-6 text-indigo-200")}>
                 This application wilh help you browse through and manage your
@@ -164,9 +161,8 @@ function WelcomeScreen() {
                   accept=".html"
                   className="hidden"
                   onChange={(ev) => {
-                    const form = document.querySelector("form");
-                    if (form !== null && ev.target.files?.length) {
-                      form.submit();
+                    if (ev.target.files?.length) {
+                      document.forms.item(0)?.submit();
                     }
                   }}
                 />

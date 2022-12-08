@@ -66,7 +66,7 @@ export function Folders({
             <div
               onClick={() => setCurrentFolder(folder)}
               className={c(
-                "flex items-center rounded-md py-1 px-1.5 select-none",
+                "flex items-center rounded-md py-1 px-1.5 mb-px select-none",
                 isSelected ? "bg-indigo-600 text-white" : "hover:bg-slate-100"
               )}
             >
