@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import type { Bookmark } from "~/models/bookmark";
+import type { Bookmark } from "~/bookmarks.types";
 import { SelectionActions } from "~/utils/selection";
 
 interface Props extends SelectionActions<Bookmark> {

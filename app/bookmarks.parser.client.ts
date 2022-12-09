@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Bookmark, BookmarkFolder, BookmarkTree } from "./bookmark";
+import type { Bookmark, BookmarkItem, Folder } from "~/bookmarks.types";
 
 export function useBookmarkTree(html: string) {
   const tree = useMemo(() => {
@@ -14,7 +14,7 @@ export function useBookmarkTree(html: string) {
 
 // --- CLIENT SIDE PARSER ---
 
-export function getBookmarkTree(dom: Document): BookmarkTree {
+export function getBookmarkTree(dom: Document): BookmarkItem[] {
   const root = dom.querySelector("dl dt dl");
   if (root instanceof HTMLDListElement) {
     return parseBookmarkTree(root);
@@ -24,6 +24,7 @@ export function getBookmarkTree(dom: Document): BookmarkTree {
 
 function parseBookmark(a: HTMLAnchorElement): Bookmark {
   return {
+    addDate: Number(a.getAttribute("add_date")),
     parentFolders: [], // TODO
     title: a.innerText,
     href: a.href,
@@ -34,15 +35,16 @@ function parseBookmark(a: HTMLAnchorElement): Bookmark {
 function parseBookmarkFolder(
   h: HTMLHeadingElement,
   dl: HTMLDListElement
-): BookmarkFolder {
+): Folder<BookmarkItem> {
   return {
+    addDate: Number(h.getAttribute("add_date")),
     parentFolders: [], // TODO
     title: h.innerText,
     children: parseBookmarkTree(dl),
   };
 }
 
-function parseBookmarkTree(dl: HTMLDListElement): BookmarkTree {
+function parseBookmarkTree(dl: HTMLDListElement): BookmarkItem[] {
   return Array.from(dl.children).reduce((_children, el) => {
     if (isHTMLDTElement(el)) {
       const bookmarkOrFolder = parse(el);
@@ -51,10 +53,10 @@ function parseBookmarkTree(dl: HTMLDListElement): BookmarkTree {
       }
     }
     return _children;
-  }, [] as BookmarkTree);
+  }, [] as BookmarkItem[]);
 }
 
-function parse(dt: HTMLDTElement): BookmarkFolder | Bookmark | null {
+function parse(dt: HTMLDTElement): BookmarkItem | null {
   const fst = dt.children.item(0);
   if (fst instanceof HTMLAnchorElement) {
     return parseBookmark(fst);

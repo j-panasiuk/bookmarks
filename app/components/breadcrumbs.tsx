@@ -1,5 +1,5 @@
 import { FolderIcon } from "@heroicons/react/24/outline";
-import type { Folder } from "~/models/bookmark";
+import type { Folder } from "~/bookmarks.types";
 
 type Props = {
   currentFolder?: Folder;

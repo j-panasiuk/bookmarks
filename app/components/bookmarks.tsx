@@ -1,6 +1,7 @@
-import { Bookmark, Folder, getItemPath, isInside } from "~/models/bookmark";
 import { SelectionActions } from "~/utils/selection";
 import { classes as c } from "~/utils/classes";
+import type { Bookmark, Folder } from "~/bookmarks.types";
+import { getItemPath, isInside } from "~/bookmarks.utils";
 
 interface Props extends SelectionActions<Bookmark> {
   bookmarks: Bookmark[];
@@ -21,18 +22,47 @@ export function Bookmarks({
   return (
     <>
       <div className={c("mb-1.5", "flex justify-between")}>
-        <h2 className={c("text-sm font-semibold text-slate-500", "flex-1")}>
+        <h2
+          className={c(
+            "todo",
+            "text-sm font-semibold text-slate-500",
+            "flex-1"
+          )}
+        >
           /{currentFolder ? getItemPath(currentFolder) : undefined}
         </h2>
-        <div>
-          <button onClick={() => deselect(currentFolderBookmarks)}>
+        <div className="flex space-x-1.5 items-center">
+          <label className="inline-flex items-center space-x-1.5 h-5">
+            <input type="checkbox" defaultChecked />
+            <span>Include subfolders</span>
+          </label>
+          <button
+            className={c(
+              "px-3 py-2 inline-flex items-center border",
+              "border-gray-300 bg-white rounded-md text-sm font-medium leading-4 text-gray-700 shadow-sm",
+              "hover:bg-gray-50",
+              "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            )}
+            onClick={() => deselect(currentFolderBookmarks)}
+          >
             Deselect all
           </button>
-          <button onClick={() => select(currentFolderBookmarks)}>
+          <button
+            className={c(
+              "px-3 py-2 inline-flex items-center border",
+              "border-gray-300 bg-white rounded-md text-sm font-medium leading-4 text-gray-700 shadow-sm",
+              "hover:bg-gray-50",
+              "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            )}
+            onClick={() => select(currentFolderBookmarks)}
+          >
             Select all
           </button>
         </div>
       </div>
+
+      <div className="todo">Search</div>
+
       {currentFolderBookmarks.map((bookmark, index) => (
         <p
           key={bookmark.title + index}

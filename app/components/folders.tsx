@@ -5,7 +5,8 @@ import {
   FolderOpenIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { Folder, isInside, isSameAs } from "~/models/bookmark";
+import type { Folder } from "~/bookmarks.types";
+import { isInside, isSameAs } from "~/bookmarks.utils";
 import { classes as c } from "~/utils/classes";
 
 type Props = {

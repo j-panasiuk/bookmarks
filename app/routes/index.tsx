@@ -1,15 +1,16 @@
 import { ActionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
+import { getBookmarksHtml } from "~/bookmarks.file";
+import { parseBookmarks, parseFolderTree } from "~/bookmarks.parser.server";
+import { Bookmark, Folder } from "~/bookmarks.types";
+import { isSameAs } from "~/bookmarks.utils";
 import { Bookmarks } from "~/components/bookmarks";
 import { BookmarkSelection } from "~/components/bookmarkSelection";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import { Fallback } from "~/components/fallback";
 import { FoldersNav } from "~/components/folders";
 import { Layout } from "~/components/layout";
-import { Bookmark, Folder, isSameAs } from "~/models/bookmark";
-import { parseBookmarks, parseFolderTree } from "~/models/bookmark.server";
-import { getBookmarksHtml } from "~/models/bookmarkFile";
 import { classes as c } from "~/utils/classes";
 import { readFile } from "~/utils/file";
 import { useSelection } from "~/utils/selection";
@@ -73,7 +74,7 @@ export default function IndexRoute() {
 
   return (
     <Layout
-      header={<Breadcrumbs currentFolder={currentFolder} />}
+      header={<></> /*<Breadcrumbs currentFolder={currentFolder} />*/}
       nav={
         <FoldersNav
           folders={folders}
