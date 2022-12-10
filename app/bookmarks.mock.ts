@@ -2,9 +2,9 @@ import type { Bookmark, Folder, Item } from "./bookmarks.types";
 import { map } from "~/utils/object";
 import { MapFn } from "./utils/fn";
 
-type Incomplete<T extends Item> = Pick<T, "parentFolders" | "title">;
+type PartialItem = Omit<Item, "addDate">;
 
-const _folders: Record<string, Incomplete<Folder>> = {
+const folderItems: Record<string, PartialItem> = {
   "/A": { parentFolders: [], title: "A" },
   "/A/A": { parentFolders: ["A"], title: "A" },
   "/A/A/A": { parentFolders: ["A", "A"], title: "A" },
@@ -15,7 +15,7 @@ const _folders: Record<string, Incomplete<Folder>> = {
   "/C/A": { parentFolders: ["C"], title: "A" },
 };
 
-const _bookmarks: Record<string, Incomplete<Bookmark>> = {
+const bookmarkItems: Record<string, PartialItem> = {
   "/a": { parentFolders: [], title: "A" },
   "/A/a": { parentFolders: ["A"], title: "A" },
   "/A/A/a": {
@@ -33,12 +33,12 @@ const _bookmarks: Record<string, Incomplete<Bookmark>> = {
   "/B/a": { parentFolders: ["B"], title: "A" },
 };
 
-const mapFolder: MapFn<Incomplete<Folder>, Folder> = (folder, i) => ({
+const toFolder: MapFn<PartialItem, Folder> = (folder, i) => ({
   ...folder,
   addDate: getFolderTimestamp(i),
   children: [],
 });
-const mapBookmark: MapFn<Incomplete<Bookmark>, Bookmark> = (bookmark, i) => ({
+const toBookmark: MapFn<PartialItem, Bookmark> = (bookmark, i) => ({
   ...bookmark,
   addDate: getBookmarkTimestamp(i),
   href: `#/${bookmark.title}`,
@@ -49,5 +49,5 @@ const mapBookmark: MapFn<Incomplete<Bookmark>, Bookmark> = (bookmark, i) => ({
 const getFolderTimestamp = (i: number) => 1.6e12 + 2 * i;
 const getBookmarkTimestamp = (i: number) => 1.6e12 + 2 * i + 1;
 
-export const folders = map(_folders, mapFolder);
-export const bookmarks = map(_bookmarks, mapBookmark);
+export const folders = map(folderItems, toFolder);
+export const bookmarks = map(bookmarkItems, toBookmark);
