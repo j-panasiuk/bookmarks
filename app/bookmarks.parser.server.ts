@@ -152,7 +152,7 @@ if (import.meta.vitest) {
     it("turns flat list of folders into a tree structure (1 level)", () => {
       expect(buildTree([f["/A"], f["/A/A"]])).toEqual([
         {
-          addDate: 1600000000000,
+          addDate: f["/A"].addDate,
           parentFolders: [],
           title: "A",
           children: [f["/A/A"]],
@@ -163,12 +163,12 @@ if (import.meta.vitest) {
     it("turns flat list of folders into a tree structure (2 levels)", () => {
       expect(buildTree([f["/A"], f["/A/A"], f["/A/A/A"]])).toEqual([
         {
-          addDate: 1600000000000,
+          addDate: f["/A"].addDate,
           parentFolders: [],
           title: "A",
           children: [
             {
-              addDate: 1600000000002,
+              addDate: f["/A/A"].addDate,
               parentFolders: ["A"],
               title: "A",
               children: [f["/A/A/A"]],
@@ -191,12 +191,12 @@ if (import.meta.vitest) {
         ])
       ).toEqual([
         {
-          addDate: 1600000000000,
+          addDate: f["/A"].addDate,
           parentFolders: [],
           title: "A",
           children: [
             {
-              addDate: 1600000000002,
+              addDate: f["/A/A"].addDate,
               parentFolders: ["A"],
               title: "A",
               children: [f["/A/A/A"]],
@@ -206,7 +206,7 @@ if (import.meta.vitest) {
         },
         f["/B"],
         {
-          addDate: 1600000000012,
+          addDate: f["/C"].addDate,
           parentFolders: [],
           title: "C",
           children: [f["/C/A"]],
