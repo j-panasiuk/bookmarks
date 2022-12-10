@@ -109,9 +109,7 @@ const splitByParentPath = (level: number) => {
 
 // --- TESTS ---
 
-// @ts-ignore
 if (import.meta.vitest) {
-  // @ts-ignore
   const { describe, it, expect } = import.meta.vitest;
 
   describe("splitByParentPath", () => {
