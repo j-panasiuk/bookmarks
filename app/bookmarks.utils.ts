@@ -35,11 +35,11 @@ export function joinPath(paths: string[]): string {
  * Compare by derived ids to tell apart bookmarks/folders with same names.
  * Works for folders and bookmarks.
  * @example
- * isSameAs(b['/A'])(b['/A']) // true
- * isSameAs(b['/A'])(A_) // false (different folders, same name)
- * isSameAs(b['/A'])(b['/B']) // false
- * isSameAs(b['/A'])(A/B) // false
- * isSameAs(b['/A'])(B/A) // false
+ * isSameAs(A)(A) // true
+ * isSameAs(A)(A_) // false (different folders, same name)
+ * isSameAs(A)(B) // false
+ * isSameAs(A)(A/B) // false
+ * isSameAs(A)(B/A) // false
  */
 export const isSameAs: Eq2<Item> = (item1) => (item2) => {
   return getDerivedId(item1) === getDerivedId(item2);
@@ -50,10 +50,10 @@ export const isSameAs: Eq2<Item> = (item1) => (item2) => {
  * A folder is not considered to be inside itself :)
  * Works for folders and bookmarks.
  * @example
- * isInside(f['/A'])(b['/B']) // false
- * isInside(f['/A'])(b['/A']) // false
- * isInside(f['/A'])(A/1) // true
- * isInside(f['/A'])(A/1/a) // true
+ * isInside(A)(B) // false
+ * isInside(A)(A) // false
+ * isInside(A)(A/1) // true
+ * isInside(A)(A/1/a) // true
  * isInside(A_)(A/1/a) // false (different folder, same name)
  */
 export const isInside =
@@ -64,9 +64,7 @@ export const isInside =
 
 // --- TESTS ---
 
-// @ts-ignore
 if (import.meta.vitest) {
-  // @ts-ignore
   const { describe, it, expect } = import.meta.vitest;
 
   describe("isSameAs", () => {

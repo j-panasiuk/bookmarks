@@ -35,15 +35,19 @@ const _bookmarks: Record<string, Incomplete<Bookmark>> = {
 
 const mapFolder: MapFn<Incomplete<Folder>, Folder> = (folder, i) => ({
   ...folder,
-  addDate: 1600000000000 + 2 * i,
+  addDate: getFolderTimestamp(i),
   children: [],
 });
 const mapBookmark: MapFn<Incomplete<Bookmark>, Bookmark> = (bookmark, i) => ({
   ...bookmark,
-  addDate: 1600000000001 + 2 * i,
+  addDate: getBookmarkTimestamp(i),
   href: `#/${bookmark.title}`,
   icon: null,
 });
+
+// Generate non-overlapping timestamps
+const getFolderTimestamp = (i: number) => 1.6e12 + 2 * i;
+const getBookmarkTimestamp = (i: number) => 1.6e12 + 2 * i + 1;
 
 export const folders = map(_folders, mapFolder);
 export const bookmarks = map(_bookmarks, mapBookmark);

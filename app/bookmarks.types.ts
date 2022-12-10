@@ -21,9 +21,6 @@ export interface Item {
    * @example
    * Folder `/Photos`
    * Folder `/Photos` (added later)
-   *
-   * For example, its possible to have
-   * two bookmark folders with identical name in the same location!
    */
   addDate: number;
 }

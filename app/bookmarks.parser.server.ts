@@ -68,7 +68,7 @@ function getParentFolderNames($el: Cheerio<Element>): string[] {
 /**
  * Given flat folder list return a tree structure.
  * @example
- * buildTree([ A, f['/B'], f['/A/A'], f['/A/A/A'] ]) // [ A [ f['/A/A'] [ f['/A/A/A'] ] ], f['/B'] ]
+ * buildTree([ A, B, A/A, A/A/A ]) // [ A [ A/A [ A/A/A ] ], B ]
  */
 function buildTree(folders: Folder[], level = 0): Folder<Folder>[] {
   // Make sure nested folders come after their parents.
