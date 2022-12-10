@@ -47,19 +47,23 @@ export const isSameAs: Eq2<Item> = (item1) => (item2) => {
 
 /**
  * Check if the second item is inside the first folder.
- * A folder is not considered to be inside itself :)
+ * By default include all subfolders.
+ * (To change this setting use `includeSubfolders = false`).
  * Works for folders and bookmarks.
  * @example
- * isInside(A)(B) // false
- * isInside(A)(A) // false
- * isInside(A)(A/1) // true
- * isInside(A)(A/1/a) // true
- * isInside(A_)(A/1/a) // false (different folder, same name)
+ * isInside(A)(A/A) // true
+ * isInside(A)(A/A/A) // true
+ * isInside(A)(A) // false (a folder is not inside itself)
+ * isInside(A)(B) // false (different folder)
+ * isInside(A_)(A/A/A) // false (same name, but different folder)
+ * isInside(A, false)(A/A/A) // false (ignore subfolders)
  */
 export const isInside =
-  (folder: Folder) =>
+  (folder: Folder, includeSubfolders: boolean = true) =>
   (item: Item): boolean => {
-    return getParentFolderPath(item).startsWith(getItemPath(folder));
+    return includeSubfolders
+      ? getParentFolderPath(item).startsWith(getItemPath(folder))
+      : getParentFolderPath(item) === getItemPath(folder);
   };
 
 // --- TESTS ---
@@ -89,7 +93,7 @@ if (import.meta.vitest) {
     });
   });
 
-  describe("isInside", () => {
+  describe("isInside (include subfolders)", () => {
     it("returns true if second folder is inside first folder", () => {
       expect(isInside(f["/A"])(f["/A"])).toBe(false);
       expect(isInside(f["/A"])(f["/B"])).toBe(false);
@@ -111,6 +115,31 @@ if (import.meta.vitest) {
       expect(isInside(f["/A/A/A"])(b["/A/A/a"])).toBe(false);
       expect(isInside(f["/A/A/A"])(b["/A/A/A/a"])).toBe(true);
       expect(isInside(f["/B"])(b["/a"])).toBe(false);
+    });
+  });
+
+  describe("isInside (no subfolders)", () => {
+    it("returns true if second folder is inside first folder", () => {
+      expect(isInside(f["/A"], false)(f["/A"])).toBe(false);
+      expect(isInside(f["/A"], false)(f["/B"])).toBe(false);
+      expect(isInside(f["/A"], false)(f["/A/A"])).toBe(true);
+      expect(isInside(f["/A/A"], false)(f["/A/B"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(f["/A/A/A"])).toBe(true);
+    });
+    it("returns true if second bookmark is inside first folder", () => {
+      expect(isInside(f["/A"], false)(b["/a"])).toBe(false);
+      expect(isInside(f["/A"], false)(b["/A/a"])).toBe(true);
+      expect(isInside(f["/A"], false)(b["/A/A/a"])).toBe(false);
+      expect(isInside(f["/A"], false)(b["/A/A/A/a"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/a"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/A/a"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/A/A/a"])).toBe(true);
+      expect(isInside(f["/A/A"], false)(b["/A/A/A/a"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/a"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/a"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/A/a"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/A/A/a"])).toBe(true);
+      expect(isInside(f["/B"], false)(b["/a"])).toBe(false);
     });
   });
 }

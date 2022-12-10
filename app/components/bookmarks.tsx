@@ -1,7 +1,9 @@
-import { SelectionActions } from "~/utils/selection";
-import { classes as c } from "~/utils/classes";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import type { Bookmark, Folder } from "~/bookmarks.types";
 import { getItemPath, isInside } from "~/bookmarks.utils";
+import { classes as c } from "~/utils/classes";
+import { SelectionActions } from "~/utils/selection";
 
 interface Props extends SelectionActions<Bookmark> {
   bookmarks: Bookmark[];
@@ -15,9 +17,20 @@ export function Bookmarks({
   select,
   deselect,
 }: Props) {
-  const currentFolderBookmarks = currentFolder
-    ? bookmarks.filter(isInside(currentFolder))
+  const [includeSubfolders, setIncludeSubfolders] = useState(true);
+  const [searchPhrase, setSearchPhrase] = useState("");
+
+  let displayedBookmarks = currentFolder
+    ? bookmarks.filter(isInside(currentFolder, includeSubfolders))
     : bookmarks;
+
+  if (searchPhrase) {
+    displayedBookmarks = displayedBookmarks.filter((bookmark) =>
+      bookmark.title
+        .toLocaleLowerCase()
+        .includes(searchPhrase.toLocaleLowerCase())
+    );
+  }
 
   return (
     <>
@@ -33,7 +46,11 @@ export function Bookmarks({
         </h2>
         <div className="flex space-x-1.5 items-center">
           <label className="inline-flex items-center space-x-1.5 h-5">
-            <input type="checkbox" defaultChecked />
+            <input
+              type="checkbox"
+              checked={includeSubfolders}
+              onChange={() => setIncludeSubfolders((val) => !val)}
+            />
             <span>Include subfolders</span>
           </label>
           <button
@@ -43,7 +60,7 @@ export function Bookmarks({
               "hover:bg-gray-50",
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             )}
-            onClick={() => deselect(currentFolderBookmarks)}
+            onClick={() => deselect(displayedBookmarks)}
           >
             Deselect all
           </button>
@@ -54,16 +71,37 @@ export function Bookmarks({
               "hover:bg-gray-50",
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             )}
-            onClick={() => select(currentFolderBookmarks)}
+            onClick={() => select(displayedBookmarks)}
           >
             Select all
           </button>
         </div>
       </div>
 
-      <div className="todo">Search</div>
+      <div>
+        <label htmlFor="search-field" className="sr-only">
+          Search
+        </label>
+        <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
+            <MagnifyingGlassIcon
+              className="h-5 w-5 ml-1.5 mr-1"
+              aria-hidden="true"
+            />
+          </div>
+          <input
+            id="search-field"
+            className="block h-full w-full border-transparent py-2 pl-8 pr-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:text-sm"
+            placeholder="Search"
+            type="search"
+            name="search"
+            value={searchPhrase}
+            onChange={(ev) => setSearchPhrase(ev.target.value)}
+          />
+        </div>
+      </div>
 
-      {currentFolderBookmarks.map((bookmark, index) => (
+      {displayedBookmarks.map((bookmark, index) => (
         <p
           key={bookmark.title + index}
           onClick={() => select(bookmark)}
