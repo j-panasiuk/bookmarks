@@ -1,9 +1,9 @@
-import { ActionArgs, json } from "@remix-run/node";
+import { type ActionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { getBookmarksHtml } from "~/bookmarks.file";
 import { parseBookmarks, parseFolderTree } from "~/bookmarks.parser.server";
-import { Bookmark, Folder } from "~/bookmarks.types";
+import type { Bookmark, Folder } from "~/bookmarks.types";
 import { isSameAs } from "~/bookmarks.utils";
 import { Bookmarks } from "~/components/bookmarks";
 import { BookmarkSelection } from "~/components/bookmarkSelection";

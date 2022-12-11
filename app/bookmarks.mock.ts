@@ -1,6 +1,6 @@
 import type { Bookmark, Folder, Item } from "./bookmarks.types";
 import { map } from "~/utils/object";
-import { MapFn } from "./utils/fn";
+import type { MapFn } from "./utils/fn";
 
 type PartialItem = Omit<Item, "addDate">;
 

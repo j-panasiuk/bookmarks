@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Eq2, not } from "./fn";
+import { type Eq2, not } from "./fn";
 
 type Options<T = unknown> = {
   initialSelection: T[];

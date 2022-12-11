@@ -1,4 +1,4 @@
-import { load, Cheerio, Element } from "cheerio";
+import { load, type Cheerio, type Element } from "cheerio";
 import { by, splitBy } from "~/utils/array";
 import type { Bookmark, Folder } from "./bookmarks.types";
 import { getFolderLevel, joinPath } from "./bookmarks.utils";

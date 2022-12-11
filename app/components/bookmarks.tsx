@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { Bookmark, Folder } from "~/bookmarks.types";
 import { getItemPath, isInside } from "~/bookmarks.utils";
 import { classes as c } from "~/utils/classes";
-import { SelectionActions } from "~/utils/selection";
+import type { SelectionActions } from "~/utils/selection";
 
 interface Props extends SelectionActions<Bookmark> {
   bookmarks: Bookmark[];
@@ -115,6 +115,7 @@ export function Bookmarks({
           <img
             src={bookmark.icon ?? undefined}
             className={c("w-5 h-5 mr-2.5")}
+            alt="Bookmark icon"
           />
           {bookmark.title} ({bookmark.parentFolders.join("/")})
         </p>
