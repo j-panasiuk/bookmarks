@@ -44,8 +44,8 @@ export function Bookmarks({
         >
           /{currentFolder ? getItemPath(currentFolder) : undefined}
         </h2>
-        <div className="flex space-x-1.5 items-center">
-          <label className="inline-flex items-center space-x-1.5 h-5">
+        <div className="flex items-center space-x-1.5">
+          <label className="inline-flex h-5 items-center space-x-1.5">
             <input
               type="checkbox"
               checked={includeSubfolders}
@@ -55,8 +55,8 @@ export function Bookmarks({
           </label>
           <button
             className={c(
-              "px-3 py-2 inline-flex items-center border",
-              "border-gray-300 bg-white rounded-md text-sm font-medium leading-4 text-gray-700 shadow-sm",
+              "inline-flex items-center border px-3 py-2",
+              "rounded-md border-gray-300 bg-white text-sm font-medium leading-4 text-gray-700 shadow-sm",
               "hover:bg-gray-50",
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             )}
@@ -66,8 +66,8 @@ export function Bookmarks({
           </button>
           <button
             className={c(
-              "px-3 py-2 inline-flex items-center border",
-              "border-gray-300 bg-white rounded-md text-sm font-medium leading-4 text-gray-700 shadow-sm",
+              "inline-flex items-center border px-3 py-2",
+              "rounded-md border-gray-300 bg-white text-sm font-medium leading-4 text-gray-700 shadow-sm",
               "hover:bg-gray-50",
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             )}
@@ -85,7 +85,7 @@ export function Bookmarks({
         <div className="relative w-full text-gray-400 focus-within:text-gray-600">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
             <MagnifyingGlassIcon
-              className="h-5 w-5 ml-1.5 mr-1"
+              className="ml-1.5 mr-1 h-5 w-5"
               aria-hidden="true"
             />
           </div>
@@ -106,7 +106,7 @@ export function Bookmarks({
           key={bookmark.title + index}
           onClick={() => select(bookmark)}
           className={c(
-            "flex items-center rounded-md py-1 px-1.5 mb-px select-none",
+            "mb-px flex select-none items-center rounded-md py-1 px-1.5",
             isSelected(bookmark)
               ? "bg-indigo-600 text-white"
               : "hover:bg-slate-200"
@@ -114,7 +114,7 @@ export function Bookmarks({
         >
           <img
             src={bookmark.icon ?? undefined}
-            className={c("w-5 h-5 mr-2.5")}
+            className={c("mr-2.5 h-5 w-5")}
             alt="Bookmark icon"
           />
           {bookmark.title} ({bookmark.parentFolders.join("/")})

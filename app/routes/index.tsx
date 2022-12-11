@@ -144,14 +144,14 @@ function WelcomeScreen() {
               <p className={c("mt-4 text-lg leading-6 text-indigo-200")}>
                 <strong>Upload</strong> the file here.
               </p>
-              <p className={c("mt-4 text-lg leading-6 text-indigo-300 italic")}>
+              <p className={c("mt-4 text-lg italic leading-6 text-indigo-300")}>
                 (...or see an example in action first)
               </p>
 
               <label
                 className={c(
-                  "mt-8 px-5 py-3 inline-flex items-center border border-transparent rounded-md",
-                  "text-base font-medium text-indigo-600 bg-white shadow",
+                  "mt-8 inline-flex items-center rounded-md border border-transparent px-5 py-3",
+                  "bg-white text-base font-medium text-indigo-600 shadow",
                   "hover:bg-indigo-50"
                 )}
               >
