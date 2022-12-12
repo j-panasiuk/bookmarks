@@ -25,7 +25,7 @@ export function splitBy<K, T>(bucketFn: MapFn<T, K>) {
   return function splitFn(array: T[]) {
     const buckets = new Map<K, T[]>();
     for (const el of array) {
-      const key = bucketFn(el);
+      const key = bucketFn(el, 0);
       const bucket = buckets.get(key);
       buckets.set(key, bucket ? bucket.concat(el) : [el]);
     }

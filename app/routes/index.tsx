@@ -1,6 +1,6 @@
 import { type ActionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { useBreadcrumbs } from "~/bookmarks.breadcrumbs";
 import { getBookmarksHtml } from "~/bookmarks.file";
 import { parseBookmarks, parseFolderTree } from "~/bookmarks.parser.server";
 import type { Bookmark, Folder } from "~/bookmarks.types";
@@ -67,14 +67,21 @@ export async function loader() {
 
 export default function IndexRoute() {
   const { bookmarks, folders } = useLoaderData<typeof loader>();
-  const [currentFolder, setCurrentFolder] = useState<Folder>();
+  const [breadcrumbs, setCurrentFolder] = useBreadcrumbs(folders);
   const [selectedBookmarks, selectionActions] = useSelection<Bookmark>({
     eq: isSameAs,
   });
 
+  const currentFolder = breadcrumbs.at(-1);
+
   return (
     <Layout
-      header={<></> /*<Breadcrumbs currentFolder={currentFolder} />*/}
+      header={
+        <Breadcrumbs
+          breadcrumbs={breadcrumbs}
+          setCurrentFolder={setCurrentFolder}
+        />
+      }
       nav={
         <FoldersNav
           folders={folders}

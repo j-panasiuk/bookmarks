@@ -12,11 +12,19 @@ export function Layout({ header, nav, main, aside }: Props) {
     <div className={c("min-h-screen", "bg-white")}>
       <div
         className={c(
-          "flex flex-1 items-center justify-between",
-          "mx-auto h-app/header pr-4",
+          "md:grid md:grid-cols-12",
+          "items-center justify-center",
+          "mx-auto h-app/header",
           "border-b border-gray-200"
         )}
       >
+        <div
+          className={c(
+            "hidden",
+            "xl:col-span-3 xl:block",
+            "h-full border-r border-gray-200"
+          )}
+        ></div>
         {header}
       </div>
 
