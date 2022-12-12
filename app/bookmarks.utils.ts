@@ -1,21 +1,14 @@
-import type { Bookmark, Folder, Item } from "./bookmarks.types";
+import type { Bookmark, Folder, Item, ItemId } from "./bookmarks.types";
 import type { Eq2 } from "./utils/fn";
 import { folders as f, bookmarks as b } from "~/bookmarks.mock";
 
-export function isFolder(val: Item): val is Folder {
-  return "children" in val && Array.isArray(val.children);
+export function getItemId(val: Pick<Item, "title" | "addDate">): ItemId {
+  const _ = val.addDate >= 0 ? "+" : "-";
+  return `${val.title}${_}${Math.abs(val.addDate)}`;
 }
 
-export function isBookmark(val: Item): val is Bookmark {
-  return "href" in val && typeof val.href === "string";
-}
-
-function getDerivedId(val: Item): string {
-  return `${getItemPath(val)}_${val.addDate}`;
-}
-
-export function getItemPath(item: Item): string {
-  return joinPath(item.parentFolders.concat(item.title));
+function getItemPath(item: Item): string {
+  return joinPath(item.parentFolders.concat(getItemId(item)));
 }
 
 function getParentFolderPath(item: Item): string {
@@ -42,7 +35,7 @@ export function joinPath(paths: string[]): string {
  * isSameAs(A)(B/A) // false
  */
 export const isSameAs: Eq2<Item> = (item1) => (item2) => {
-  return getDerivedId(item1) === getDerivedId(item2);
+  return getItemId(item1) === getItemId(item2);
 };
 
 /**
@@ -66,10 +59,47 @@ export const isInside =
       : getParentFolderPath(item) === getItemPath(folder);
   };
 
+export const contains =
+  (item: Item, includeSubfolders: boolean = true) =>
+  (folder: Folder) => {
+    return includeSubfolders
+      ? getParentFolderPath(item).startsWith(getItemPath(folder))
+      : getParentFolderPath(item) === getItemPath(folder);
+  };
+
 // --- TESTS ---
 
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
+
+  describe("getItemId", () => {
+    it("returns a string including `title` and `addDate`", () => {
+      expect(getItemId(f["/A"])).toBe("A+65");
+      expect(getItemId(f["/B"])).toBe("B+66");
+      expect(getItemId(f["/A/A"])).toBe("A+715");
+      expect(getItemId(f["/A/A/A"])).toBe("A+7215");
+      expect(getItemId(f["/A_"])).toBe("A+160");
+      expect(getItemId(f["/A_/A"])).toBe("A+810");
+      expect(getItemId(b["/A"])).toBe("A-65");
+      expect(getItemId(b["/A/A"])).toBe("A-715");
+    });
+    it("returns different ids even if two items are named the same", () => {
+      expect(getItemId(f["/A"])).not.toEqual(getItemId(f["/A_"]));
+      expect(getItemId(f["/A"])).not.toEqual(getItemId(b["/A"]));
+      expect(getItemId(f["/A/A"])).not.toEqual(getItemId(f["/A_/A"]));
+      expect(getItemId(f["/A/A"])).not.toEqual(getItemId(f["/A/A_"]));
+      expect(getItemId(b["/A"])).not.toEqual(getItemId(b["/A_"]));
+    });
+  });
+
+  describe("getItemPath", () => {
+    it("returns item's parent ids joined with items own id", () => {
+      expect(getItemPath(f["/A"])).toBe("A+65");
+      expect(getItemPath(b["/A"])).toBe("A-65");
+      expect(getItemPath(f["/A/A"])).toBe("A+65/A+715");
+      expect(getItemPath(f["/A_/A"])).toBe("A+160/A+810");
+    });
+  });
 
   describe("isSameAs", () => {
     it("returns true if given the same folder (compare by location and title)", () => {
@@ -83,13 +113,17 @@ if (import.meta.vitest) {
       expect(isSameAs(f["/A/A"])(f["/A/A/A"])).toBe(false);
     });
     it("returns true if given the same file (compare by location and title)", () => {
-      expect(isSameAs(b["/a"])({ ...b["/a"] })).toBe(true);
-      expect(isSameAs(b["/a"])({ ...b["/a"], href: "#zzz" } as Bookmark)).toBe(
+      expect(isSameAs(b["/A"])({ ...b["/A"] })).toBe(true);
+      expect(isSameAs(b["/A"])({ ...b["/A"], href: "#zzz" } as Bookmark)).toBe(
         true
       );
-      expect(isSameAs(b["/a"])(b["/A/a"])).toBe(false);
-      expect(isSameAs(b["/a"])(b["/A/A/a"])).toBe(false);
-      expect(isSameAs(b["/a"])(b["/A/A/A/a"])).toBe(false);
+      expect(isSameAs(b["/A"])(b["/A/A"])).toBe(false);
+      expect(isSameAs(b["/A"])(b["/A/A/A"])).toBe(false);
+      expect(isSameAs(b["/A"])(b["/A/A/A/A"])).toBe(false);
+    });
+    it("returns false if given items with same title but different add timestamps", () => {
+      expect(isSameAs(f["/A"])(f["/A_"])).toBe(false);
+      expect(isSameAs(f["/A/A"])(f["/A_/A"])).toBe(false);
     });
   });
 
@@ -102,19 +136,19 @@ if (import.meta.vitest) {
       expect(isInside(f["/A/A"])(f["/A/A/A"])).toBe(true);
     });
     it("returns true if second bookmark is inside first folder", () => {
-      expect(isInside(f["/A"])(b["/a"])).toBe(false);
-      expect(isInside(f["/A"])(b["/A/a"])).toBe(true);
-      expect(isInside(f["/A"])(b["/A/A/a"])).toBe(true);
-      expect(isInside(f["/A"])(b["/A/A/A/a"])).toBe(true);
-      expect(isInside(f["/A/A"])(b["/a"])).toBe(false);
-      expect(isInside(f["/A/A"])(b["/A/a"])).toBe(false);
-      expect(isInside(f["/A/A"])(b["/A/A/a"])).toBe(true);
-      expect(isInside(f["/A/A"])(b["/A/A/A/a"])).toBe(true);
-      expect(isInside(f["/A/A/A"])(b["/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"])(b["/A/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"])(b["/A/A/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"])(b["/A/A/A/a"])).toBe(true);
-      expect(isInside(f["/B"])(b["/a"])).toBe(false);
+      expect(isInside(f["/A"])(b["/A"])).toBe(false);
+      expect(isInside(f["/A"])(b["/A/A"])).toBe(true);
+      expect(isInside(f["/A"])(b["/A/A/A"])).toBe(true);
+      expect(isInside(f["/A"])(b["/A/A/A/A"])).toBe(true);
+      expect(isInside(f["/A/A"])(b["/A"])).toBe(false);
+      expect(isInside(f["/A/A"])(b["/A/A"])).toBe(false);
+      expect(isInside(f["/A/A"])(b["/A/A/A"])).toBe(true);
+      expect(isInside(f["/A/A"])(b["/A/A/A/A"])).toBe(true);
+      expect(isInside(f["/A/A/A"])(b["/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"])(b["/A/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"])(b["/A/A/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"])(b["/A/A/A/A"])).toBe(true);
+      expect(isInside(f["/B"])(b["/A"])).toBe(false);
     });
   });
 
@@ -127,19 +161,71 @@ if (import.meta.vitest) {
       expect(isInside(f["/A/A"], false)(f["/A/A/A"])).toBe(true);
     });
     it("returns true if second bookmark is inside first folder", () => {
-      expect(isInside(f["/A"], false)(b["/a"])).toBe(false);
-      expect(isInside(f["/A"], false)(b["/A/a"])).toBe(true);
-      expect(isInside(f["/A"], false)(b["/A/A/a"])).toBe(false);
-      expect(isInside(f["/A"], false)(b["/A/A/A/a"])).toBe(false);
-      expect(isInside(f["/A/A"], false)(b["/a"])).toBe(false);
-      expect(isInside(f["/A/A"], false)(b["/A/a"])).toBe(false);
-      expect(isInside(f["/A/A"], false)(b["/A/A/a"])).toBe(true);
-      expect(isInside(f["/A/A"], false)(b["/A/A/A/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"], false)(b["/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"], false)(b["/A/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"], false)(b["/A/A/a"])).toBe(false);
-      expect(isInside(f["/A/A/A"], false)(b["/A/A/A/a"])).toBe(true);
-      expect(isInside(f["/B"], false)(b["/a"])).toBe(false);
+      expect(isInside(f["/A"], false)(b["/A"])).toBe(false);
+      expect(isInside(f["/A"], false)(b["/A/A"])).toBe(true);
+      expect(isInside(f["/A"], false)(b["/A/A/A"])).toBe(false);
+      expect(isInside(f["/A"], false)(b["/A/A/A/A"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/A"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/A/A"])).toBe(false);
+      expect(isInside(f["/A/A"], false)(b["/A/A/A"])).toBe(true);
+      expect(isInside(f["/A/A"], false)(b["/A/A/A/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/A/A"])).toBe(false);
+      expect(isInside(f["/A/A/A"], false)(b["/A/A/A/A"])).toBe(true);
+      expect(isInside(f["/B"], false)(b["/A"])).toBe(false);
+    });
+  });
+
+  describe("contains (include subfolders)", () => {
+    it("returns true if second folder contains first folder", () => {
+      expect(contains(f["/A"])(f["/A"])).toBe(false);
+      expect(contains(f["/B"])(f["/A"])).toBe(false);
+      expect(contains(f["/A/A"])(f["/A"])).toBe(true);
+      expect(contains(f["/A/B"])(f["/A/A"])).toBe(false);
+      expect(contains(f["/A/A/A"])(f["/A"])).toBe(true);
+      expect(contains(f["/A/A/A"])(f["/A/A"])).toBe(true);
+    });
+    it("returns true if second folder contains first bookmark", () => {
+      expect(contains(b["/A"])(f["/A"])).toBe(false);
+      expect(contains(b["/A/A"])(f["/A"])).toBe(true);
+      expect(contains(b["/A/A/A"])(f["/A"])).toBe(true);
+      expect(contains(b["/A/A/A/A"])(f["/A"])).toBe(true);
+      expect(contains(b["/A"])(f["/A/A"])).toBe(false);
+      expect(contains(b["/A/A"])(f["/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A"])(f["/A/A"])).toBe(true);
+      expect(contains(b["/A/A/A/A"])(f["/A/A"])).toBe(true);
+      expect(contains(b["/A"])(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A"])(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A"])(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A/A"])(f["/A/A/A"])).toBe(true);
+      expect(contains(b["/A"])(f["/B"])).toBe(false);
+    });
+  });
+
+  describe("contains (no subfolders)", () => {
+    it("returns true if second folder contains first folder", () => {
+      expect(contains(f["/A"], false)(f["/A"])).toBe(false);
+      expect(contains(f["/B"], false)(f["/A"])).toBe(false);
+      expect(contains(f["/A/A"], false)(f["/A"])).toBe(true);
+      expect(contains(f["/A/B"], false)(f["/A/A"])).toBe(false);
+      expect(contains(f["/A/A/A"], false)(f["/A"])).toBe(false);
+      expect(contains(f["/A/A/A"], false)(f["/A/A"])).toBe(true);
+    });
+    it("returns true if second folder contains first bookmark", () => {
+      expect(contains(b["/A"], false)(f["/A"])).toBe(false);
+      expect(contains(b["/A/A"], false)(f["/A"])).toBe(true);
+      expect(contains(b["/A/A/A"], false)(f["/A"])).toBe(false);
+      expect(contains(b["/A/A/A/A"], false)(f["/A"])).toBe(false);
+      expect(contains(b["/A"], false)(f["/A/A"])).toBe(false);
+      expect(contains(b["/A/A"], false)(f["/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A"], false)(f["/A/A"])).toBe(true);
+      expect(contains(b["/A/A/A/A"], false)(f["/A/A"])).toBe(false);
+      expect(contains(b["/A"], false)(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A"], false)(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A"], false)(f["/A/A/A"])).toBe(false);
+      expect(contains(b["/A/A/A/A"], false)(f["/A/A/A"])).toBe(true);
+      expect(contains(b["/A"], false)(f["/B"])).toBe(false);
     });
   });
 }

@@ -1,7 +1,7 @@
 import { load, type Cheerio, type Element } from "cheerio";
 import { by, splitBy } from "~/utils/array";
-import type { Bookmark, Folder } from "./bookmarks.types";
-import { getFolderLevel, joinPath } from "./bookmarks.utils";
+import type { Bookmark, Folder, ItemId } from "./bookmarks.types";
+import { getFolderLevel, getItemId, joinPath } from "./bookmarks.utils";
 import { folders as f, bookmarks as b } from "./bookmarks.mock";
 
 export function parseBookmarks(html: string): Bookmark[] {
@@ -51,15 +51,19 @@ export function parseFolderTree(html: string): Folder<Folder>[] {
  * Get list of parent folder names, in nesting order.
  * Ignore first 2 levels of nesting, since these are not user-created folders
  */
-function getUserFolders($el: Cheerio<Element>): string[] {
-  return getParentFolderNames($el).slice(2);
+function getUserFolders($el: Cheerio<Element>): ItemId[] {
+  return getParentFolderIds($el).slice(2);
 }
 
-function getParentFolderNames($el: Cheerio<Element>): string[] {
+function getParentFolderIds($el: Cheerio<Element>): ItemId[] {
   const $dl = $el.closest("dl").prev();
-  const currentFolderName = $dl.text();
   return $dl.length > 0
-    ? getParentFolderNames($dl).concat([currentFolderName])
+    ? getParentFolderIds($dl).concat([
+        getItemId({
+          title: $dl.text(),
+          addDate: Number($dl.attr("add_date")),
+        }),
+      ])
     : [];
 }
 
@@ -93,13 +97,12 @@ const sortByLevel = by(getFolderLevel);
 
 /**
  * Create a grouping function based on current nesting level.
- * @internal
  */
 const splitByParentPath = (level: number) => {
   return splitBy((f: Folder): string => {
     const parentPath = joinPath(
       f.parentFolders.length === level
-        ? f.parentFolders.concat(f.title)
+        ? f.parentFolders.concat(getItemId(f))
         : f.parentFolders.slice(0, 1 + level)
     );
 
@@ -167,7 +170,7 @@ if (import.meta.vitest) {
           children: [
             {
               addDate: f["/A/A"].addDate,
-              parentFolders: ["A"],
+              parentFolders: ["A+65"],
               title: "A",
               children: [f["/A/A/A"]],
             },
@@ -189,14 +192,10 @@ if (import.meta.vitest) {
         ])
       ).toEqual([
         {
-          addDate: f["/A"].addDate,
-          parentFolders: [],
-          title: "A",
+          ...f["/A"],
           children: [
             {
-              addDate: f["/A/A"].addDate,
-              parentFolders: ["A"],
-              title: "A",
+              ...f["/A/A"],
               children: [f["/A/A/A"]],
             },
             f["/A/B"],
@@ -204,9 +203,7 @@ if (import.meta.vitest) {
         },
         f["/B"],
         {
-          addDate: f["/C"].addDate,
-          parentFolders: [],
-          title: "C",
+          ...f["/C"],
           children: [f["/C/A"]],
         },
       ]);
