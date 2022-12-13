@@ -59,9 +59,21 @@ export const isInside =
       : getParentFolderPath(item) === getItemPath(folder);
   };
 
+/**
+ * Check if the second folder contains the first item.
+ * By default include all subfolders.
+ * (To change this setting use `includeSubfolders = false`).
+ * Works for folders and bookmarks.
+ * @example
+ * contains(A/A)(A) // true
+ * contains(A)(A) // false (a folder is not inside itself)
+ * contains(A)(B) // false (different folder)
+ * contains(A/A)(A_) // false (same name, but different folder)
+ * contains(A/A/A, false)(A) // false (ignore subfolders)
+ */
 export const contains =
   (item: Item, includeSubfolders: boolean = true) =>
-  (folder: Folder) => {
+  (folder: Folder): boolean => {
     return includeSubfolders
       ? getParentFolderPath(item).startsWith(getItemPath(folder))
       : getParentFolderPath(item) === getItemPath(folder);

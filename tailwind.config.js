@@ -6,8 +6,8 @@ module.exports = {
   theme: {
     extend: {
       height: {
-        "app/header": "4rem",
-        "app/main": "calc(100vh - 4rem)",
+        "app/header": "3rem",
+        "app/main": "calc(100vh - 3rem)",
       },
     },
   },

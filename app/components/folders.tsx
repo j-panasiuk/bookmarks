@@ -1,3 +1,4 @@
+import { HomeIcon } from "@heroicons/react/20/solid";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -20,10 +21,17 @@ export function FoldersNav(props: Props) {
 
   return (
     <>
-      <div className={c("mb-1.5", "flex")}>
-        <h2 className={c("text-sm font-semibold text-slate-500", "flex-1")}>
-          FOLDERS
-        </h2>
+      <div className={c("flex")}>
+        <button
+          className={c(
+            "mr-1 mb-px cursor-default select-none items-center rounded-md py-1 px-1.5 text-sm font-semibold text-slate-500 hover:bg-slate-100",
+            "flex flex-1"
+          )}
+          onClick={() => props.setCurrentFolder()}
+        >
+          <FolderOpenIcon className={c("mr-2.5 h-5 w-5")} />
+          <h2 className="my-0.5 h-5">FOLDERS</h2>
+        </button>
         <button onClick={() => setIsExpanded(true)}>
           <ChevronDownIcon
             aria-hidden
@@ -68,13 +76,15 @@ export function Folders({
               onClick={() => setCurrentFolder(folder)}
               className={c(
                 "mb-px flex select-none items-center rounded-md py-1 px-1.5",
-                isSelected ? "bg-indigo-600 text-white" : "hover:bg-slate-100"
+                isSelected
+                  ? "bg-slate-100 text-slate-600"
+                  : "hover:bg-slate-100"
               )}
             >
               <Icon
                 className={c(
                   "mr-2.5 h-5 w-5 flex-none stroke-2",
-                  isSelected ? "stroke-white" : "stroke-slate-400"
+                  isSelected ? "stroke-slate-600" : "stroke-slate-400"
                 )}
               />
               {folder.title}

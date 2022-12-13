@@ -30,12 +30,14 @@ export function parseFolders(html: string): Folder[] {
 
   $("h3").each((_, el) => {
     let $h3 = $(el);
-    folders.push({
-      addDate: Number($h3.attr("add_date")),
-      parentFolders: getUserFolders($h3),
-      title: $h3.text(),
-      children: [],
-    });
+    if (!$h3.attr("personal_toolbar_folder")) {
+      folders.push({
+        addDate: Number($h3.attr("add_date")),
+        parentFolders: getUserFolders($h3),
+        title: $h3.text(),
+        children: [],
+      });
+    }
   });
 
   return folders;
@@ -75,20 +77,16 @@ function getParentFolderIds($el: Cheerio<Element>): ItemId[] {
  * buildTree([ A, B, A/A, A/A/A ]) // [ A [ A/A [ A/A/A ] ], B ]
  */
 function buildTree(folders: Folder[], level = 0): Folder<Folder>[] {
-  // Make sure nested folders come after their parents.
-  // This makes sure there is one less thing to worry about later.
   const foldersSorted = folders.sort(sortByLevel);
   const foldersGroupedByParent = splitByParentPath(level)(foldersSorted);
+  const tree = foldersGroupedByParent.flatMap(buildSubtree);
 
-  const tree: Folder<Folder>[] = foldersGroupedByParent.flatMap(
-    ([folder, ...children]) => {
-      if (children.length > 0) {
-        // Repeat building process on next level.
-        folder.children = buildTree(children, level + 1);
-      }
-      return folder as Folder<Folder>;
+  function buildSubtree([folder, ...children]: Folder[]): Folder<Folder> {
+    if (children.length > 0) {
+      folder.children = buildTree(children, level + 1);
     }
-  );
+    return folder as Folder<Folder>;
+  }
 
   return tree;
 }
