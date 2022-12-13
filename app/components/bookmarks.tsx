@@ -103,17 +103,17 @@ export function Bookmarks({
               : "hover:bg-slate-200"
           )}
         >
-          {bookmark.icon ? (
-            <img src={bookmark.icon} className={c("mr-2.5 h-5 w-5")} alt="" />
-          ) : (
-            <div
-              className={c(
-                "mr-2.5 h-5 w-5",
-                "rounded-sm border border-slate-300"
-              )}
-            />
-          )}
-          {bookmark.title} ({bookmark.parentFolders.join("/")})
+          <img
+            src={bookmark.icon ?? ""}
+            className={c(
+              "relative mr-2.5 h-5 w-5",
+              !bookmark.icon
+                ? "after:absolute after:top-0 after:left-0 after:z-10 after:h-5 after:w-5 after:bg-slate-100"
+                : undefined
+            )}
+            alt=""
+          />
+          {bookmark.title}
         </p>
       ))}
     </>
