@@ -24,7 +24,7 @@ export function FoldersNav(props: Props) {
       <div className={c("flex")}>
         <button
           className={c(
-            "mr-1 mb-px cursor-default select-none items-center rounded-md py-1 px-1.5 text-sm font-semibold text-slate-500 hover:bg-slate-100",
+            "mr-1 mb-px cursor-default select-none items-center rounded-md py-1 px-1.5 text-sm font-semibold text-slate-500 hover:bg-slate-50",
             "flex flex-1"
           )}
           onClick={() => props.setCurrentFolder()}
@@ -76,9 +76,7 @@ export function Folders({
               onClick={() => setCurrentFolder(folder)}
               className={c(
                 "mb-px flex select-none items-center rounded-md py-1 px-1.5",
-                isSelected
-                  ? "bg-slate-100 text-slate-600"
-                  : "hover:bg-slate-100"
+                isSelected ? "bg-slate-100 text-slate-600" : "hover:bg-slate-50"
               )}
             >
               <Icon

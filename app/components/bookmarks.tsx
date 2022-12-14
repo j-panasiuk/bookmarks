@@ -1,7 +1,7 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import type { Bookmark, Folder } from "~/bookmarks.types";
-import { isInside } from "~/bookmarks.utils";
+import { isInside, isTopLevel } from "~/bookmarks.utils";
 import { classes as c } from "~/utils/classes";
 import type { SelectionActions } from "~/utils/selection";
 
@@ -20,9 +20,11 @@ export function Bookmarks({
   const [includeSubfolders, setIncludeSubfolders] = useState(true);
   const [searchPhrase, setSearchPhrase] = useState("");
 
-  let displayedBookmarks = currentFolder
-    ? bookmarks.filter(isInside(currentFolder, includeSubfolders))
-    : bookmarks;
+  let displayedBookmarks = !currentFolder
+    ? includeSubfolders
+      ? bookmarks
+      : bookmarks.filter(isTopLevel)
+    : bookmarks.filter(isInside(currentFolder, includeSubfolders));
 
   if (searchPhrase) {
     displayedBookmarks = displayedBookmarks.filter((bookmark) =>

@@ -79,6 +79,10 @@ export const contains =
       : getParentFolderPath(item) === getItemPath(folder);
   };
 
+export function isTopLevel(item: Item): boolean {
+  return item.parentFolders.length === 0;
+}
+
 // --- TESTS ---
 
 if (import.meta.vitest) {
