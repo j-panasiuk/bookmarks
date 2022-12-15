@@ -1,11 +1,15 @@
 import type { ActionArgs } from "@remix-run/node";
-import { writeLinksFile } from "./saveToFile.utils";
+import { join } from "path";
+import { writeTextFile } from "~/utils/file";
 
 export async function action({ request }: ActionArgs) {
   try {
     const { content } = Object.fromEntries(await request.formData());
     if (typeof content === "string") {
-      await writeLinksFile(content);
+      await writeTextFile(
+        process.env.EXPORT_LINKS_FILE_PATH || join(__dirname, DEFAULT_PATH),
+        content
+      );
       return new Response(null, { status: 204 });
     } else {
       throw new Response("Content field is missing", { status: 404 });
@@ -18,3 +22,5 @@ export async function action({ request }: ActionArgs) {
     );
   }
 }
+
+const DEFAULT_PATH = "../example/links.txt";

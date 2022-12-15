@@ -14,6 +14,7 @@ import { Layout } from "~/components/layout";
 import { classes as c } from "~/utils/classes";
 import { readFile } from "~/utils/file";
 import { useSelection } from "~/utils/selection";
+import { getBookmarksFilePath } from "./index.fs";
 
 // In-memory cache
 type Cache = {
@@ -24,6 +25,8 @@ type Cache = {
 
 const cache: Cache = {};
 
+// --- IMPORT BOOKMARKS FILE ---
+
 export async function action({ request }: ActionArgs) {
   const payload = Object.fromEntries(await request.formData());
   if (payload.file instanceof File) {
@@ -32,22 +35,7 @@ export async function action({ request }: ActionArgs) {
   return null;
 }
 
-async function loadBookmarksFileHtml(): Promise<string> {
-  // Load bookmarks html from memory cache
-  if (cache.html) {
-    return cache.html;
-  }
-
-  // Load bookmarks html from disk
-  // Also cache it for quicker access later
-  const bookmarksFilePath = process.env.BOOKMARKS_FILE_PATH;
-  if (bookmarksFilePath) {
-    cache.html = await readFile(bookmarksFilePath);
-    return cache.html;
-  }
-
-  throw new Error("Bookmarks file not found");
-}
+// --- READ BOOKMARKS FILE ---
 
 export async function loader() {
   try {
@@ -63,6 +51,23 @@ export async function loader() {
       { status: 404 }
     );
   }
+}
+
+async function loadBookmarksFileHtml(): Promise<string> {
+  // Load bookmarks html from memory cache
+  if (cache.html) {
+    return cache.html;
+  }
+
+  // Load bookmarks html from disk
+  // Also cache it for quicker access later
+  const bookmarksFilePath = await getBookmarksFilePath();
+  if (bookmarksFilePath) {
+    cache.html = await readFile(bookmarksFilePath);
+    return cache.html;
+  }
+
+  throw new Error("Bookmarks file not found");
 }
 
 export default function IndexRoute() {
