@@ -1,10 +1,10 @@
 import { join } from "path";
-import { existsSync } from "fs";
 import { readdir } from "fs/promises";
+import { isFilePath } from "~/utils/file";
 
 export async function getBookmarksFilePath(): Promise<string | undefined> {
   const filePathFromEnv = process.env.BOOKMARKS_FILE_PATH;
-  if (filePathFromEnv && existsSync(filePathFromEnv)) {
+  if (filePathFromEnv && (await isFilePath(filePathFromEnv))) {
     return filePathFromEnv;
   }
 
@@ -14,7 +14,7 @@ export async function getBookmarksFilePath(): Promise<string | undefined> {
   );
   if (file) {
     const filePathFromImports = join(__dirname, PATH_TO_IMPORTS, file);
-    if (existsSync(filePathFromImports)) {
+    if (await isFilePath(filePathFromImports)) {
       return filePathFromImports;
     }
   }

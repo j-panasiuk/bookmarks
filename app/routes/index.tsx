@@ -10,40 +10,44 @@ import { BookmarkSelection } from "~/components/bookmarkSelection";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import { Fallback } from "~/components/fallback";
 import { FoldersNav } from "~/components/folders";
+import Header from "~/components/header";
 import { Layout } from "~/components/layout";
 import { classes as c } from "~/utils/classes";
-import { readFile } from "~/utils/file";
+import { readTextFile } from "~/utils/file";
 import { useSelection } from "~/utils/selection";
 import { getBookmarksFilePath } from "./index.fs";
 
 // In-memory cache
 type Cache = {
-  html?: string;
-  bookmarks?: Bookmark[]; // TODO cache structured data too for less parsing
-  folders?: Folder<Folder>[]; // TODO cache structured data too for less parsing
+  fileName: string;
+  html: string;
+  bookmarks: Bookmark[];
+  folders: Folder<Folder>[];
 };
 
-const cache: Cache = {};
+const cache: Partial<Cache> = {};
 
 // --- IMPORT BOOKMARKS FILE ---
 
 export async function action({ request }: ActionArgs) {
   const payload = Object.fromEntries(await request.formData());
   if (payload.file instanceof File) {
+    cache.fileName = payload.file.name;
     cache.html = await getBookmarksHtml(payload.file);
+    delete cache.bookmarks;
+    delete cache.folders;
   }
-  return null;
+  return new Response(null, { status: 201 });
 }
 
 // --- READ BOOKMARKS FILE ---
 
 export async function loader() {
   try {
-    const html = await loadBookmarksFileHtml();
-    const bookmarks = parseBookmarks(html);
-    const folders = parseFolderTree(html);
+    const { fileName, html } = await loadBookmarksFile();
+    const { bookmarks, folders } = parseBookmarksAndFolders(html);
 
-    return json({ bookmarks, folders });
+    return json({ fileName, bookmarks, folders });
   } catch (err) {
     console.log("err", err);
     throw new Response(
@@ -53,25 +57,59 @@ export async function loader() {
   }
 }
 
-async function loadBookmarksFileHtml(): Promise<string> {
+async function loadBookmarksFile(): Promise<{
+  fileName: string;
+  html: string;
+}> {
   // Load bookmarks html from memory cache
-  if (cache.html) {
-    return cache.html;
+  if (cache.fileName && cache.html) {
+    return {
+      fileName: cache.fileName,
+      html: cache.html,
+    };
   }
 
   // Load bookmarks html from disk
   // Also cache it for quicker access later
   const bookmarksFilePath = await getBookmarksFilePath();
   if (bookmarksFilePath) {
-    cache.html = await readFile(bookmarksFilePath);
-    return cache.html;
+    cache.fileName = bookmarksFilePath;
+    cache.html = await readTextFile(bookmarksFilePath);
+    return {
+      fileName: cache.fileName,
+      html: cache.html,
+    };
   }
 
   throw new Error("Bookmarks file not found");
 }
 
+function parseBookmarksAndFolders(html: string): {
+  bookmarks: Bookmark[];
+  folders: Folder<Folder>[];
+} {
+  // Load parsed bookmarks and folders from memory cache
+  if (cache.bookmarks && cache.folders) {
+    return {
+      bookmarks: cache.bookmarks,
+      folders: cache.folders,
+    };
+  }
+
+  // Parse bookmarks and folders from loaded html
+  // Also cache it for quicker access later
+  const bookmarks = parseBookmarks(html);
+  const folders = parseFolderTree(html);
+  cache.bookmarks = bookmarks;
+  cache.folders = folders;
+  return {
+    bookmarks: cache.bookmarks,
+    folders: cache.folders,
+  };
+}
+
 export default function IndexRoute() {
-  const { bookmarks, folders } = useLoaderData<typeof loader>();
+  const { fileName, bookmarks, folders } = useLoaderData<typeof loader>();
   const [breadcrumbs, setCurrentFolder] = useBreadcrumbs(folders);
   const [selectedBookmarks, selectionActions] = useSelection<Bookmark>({
     eq: isSameAs,
@@ -81,12 +119,7 @@ export default function IndexRoute() {
 
   return (
     <Layout
-      header={
-        <Breadcrumbs
-          breadcrumbs={breadcrumbs}
-          setCurrentFolder={setCurrentFolder}
-        />
-      }
+      header={<Header fileName={fileName} />}
       nav={
         <FoldersNav
           folders={folders}
