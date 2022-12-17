@@ -3,8 +3,9 @@ import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
 import { useBreadcrumbs } from "~/bookmarks.breadcrumbs";
 import { getBookmarksHtml } from "~/bookmarks.file";
 import { parseBookmarks, parseFolderTree } from "~/bookmarks.parser.server";
-import type { Bookmark, Folder } from "~/bookmarks.types";
+import type { Bookmark } from "~/bookmarks.types";
 import { isSameAs } from "~/bookmarks.utils";
+import { cache } from "~/cache.server";
 import { Bookmarks } from "~/components/bookmarks";
 import { BookmarkSelection } from "~/components/bookmarkSelection";
 import { Breadcrumbs } from "~/components/breadcrumbs";
@@ -12,100 +13,74 @@ import { Fallback } from "~/components/fallback";
 import { FoldersNav } from "~/components/folders";
 import Header from "~/components/header";
 import { Layout } from "~/components/layout";
+import { assert } from "~/utils/assert";
 import { classes as c } from "~/utils/classes";
 import { readTextFile } from "~/utils/file";
 import { useSelection } from "~/utils/selection";
 import { getBookmarksFilePath } from "./index.fs";
 
-// In-memory cache
-type Cache = {
-  fileName: string;
-  html: string;
-  bookmarks: Bookmark[];
-  folders: Folder<Folder>[];
-};
-
-const cache: Partial<Cache> = {};
-
 // --- IMPORT BOOKMARKS FILE ---
 
 export async function action({ request }: ActionArgs) {
   const payload = Object.fromEntries(await request.formData());
+
   if (payload.file instanceof File) {
-    cache.fileName = payload.file.name;
-    cache.html = await getBookmarksHtml(payload.file);
+    const fileName = payload.file.name;
+    const html = await getBookmarksHtml(payload.file);
+
+    cache.fileName = fileName;
+    cache.html = html;
     delete cache.bookmarks;
     delete cache.folders;
+
+    return new Response(null, { status: 201 });
   }
-  return new Response(null, { status: 201 });
+
+  throw new Response("Failed to upload bookmarks file", { status: 400 });
 }
 
 // --- READ BOOKMARKS FILE ---
 
 export async function loader() {
   try {
-    const { fileName, html } = await loadBookmarksFile();
-    const { bookmarks, folders } = parseBookmarksAndFolders(html);
+    let { fileName, html, bookmarks, folders } = cache;
+
+    if (!fileName) {
+      fileName = await getBookmarksFilePath();
+      assert(fileName, "Failed to find bookmarks file", 404);
+      cache.fileName = fileName;
+    }
+
+    if (!html) {
+      html = await readTextFile(fileName);
+      assert(html, "Failed to read bookmarks file", 404);
+      cache.html = html;
+    }
+
+    if (!bookmarks) {
+      bookmarks = parseBookmarks(html);
+      cache.bookmarks = bookmarks;
+    }
+
+    if (!folders) {
+      folders = parseFolderTree(html);
+      cache.folders = folders;
+    }
 
     return json({ fileName, bookmarks, folders });
   } catch (err) {
-    console.log("err", err);
+    console.log("loader/err", err);
+
     throw new Response(
-      err instanceof Error ? err.message : "Could not read bookmarks file",
-      { status: 404 }
+      err instanceof Error ? err.message : "Failed to load bookmarks",
+      {
+        status:
+          err instanceof Error && typeof err.cause === "number"
+            ? err.cause
+            : 500,
+      }
     );
   }
-}
-
-async function loadBookmarksFile(): Promise<{
-  fileName: string;
-  html: string;
-}> {
-  // Load bookmarks html from memory cache
-  if (cache.fileName && cache.html) {
-    return {
-      fileName: cache.fileName,
-      html: cache.html,
-    };
-  }
-
-  // Load bookmarks html from disk
-  // Also cache it for quicker access later
-  const bookmarksFilePath = await getBookmarksFilePath();
-  if (bookmarksFilePath) {
-    cache.fileName = bookmarksFilePath;
-    cache.html = await readTextFile(bookmarksFilePath);
-    return {
-      fileName: cache.fileName,
-      html: cache.html,
-    };
-  }
-
-  throw new Error("Bookmarks file not found");
-}
-
-function parseBookmarksAndFolders(html: string): {
-  bookmarks: Bookmark[];
-  folders: Folder<Folder>[];
-} {
-  // Load parsed bookmarks and folders from memory cache
-  if (cache.bookmarks && cache.folders) {
-    return {
-      bookmarks: cache.bookmarks,
-      folders: cache.folders,
-    };
-  }
-
-  // Parse bookmarks and folders from loaded html
-  // Also cache it for quicker access later
-  const bookmarks = parseBookmarks(html);
-  const folders = parseFolderTree(html);
-  cache.bookmarks = bookmarks;
-  cache.folders = folders;
-  return {
-    bookmarks: cache.bookmarks,
-    folders: cache.folders,
-  };
 }
 
 export default function IndexRoute() {
