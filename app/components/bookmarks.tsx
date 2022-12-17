@@ -61,14 +61,25 @@ export function Bookmarks({
         </div>
 
         <div className="flex items-center space-x-1.5">
-          <label className="inline-flex h-5 items-center space-x-1.5">
-            <input
-              type="checkbox"
-              checked={includeSubfolders}
-              onChange={() => setIncludeSubfolders((val) => !val)}
-            />
-            <span>Include subfolders</span>
-          </label>
+          <div className="relative ml-2.5 flex items-start">
+            <div className="flex h-5 items-center">
+              <input
+                id="subfolders"
+                type="checkbox"
+                className={c(
+                  "h-4 w-4 rounded border-gray-300 text-indigo-600",
+                  "focus:ring-indigo-500"
+                )}
+                checked={includeSubfolders}
+                onChange={() => setIncludeSubfolders((val) => !val)}
+              />
+            </div>
+            <div className="ml-2 text-sm">
+              <label htmlFor="subfolders" className="font-medium text-gray-700">
+                Include subfolders
+              </label>
+            </div>
+          </div>
           <button
             className={c(
               "inline-flex items-center border px-3 py-2",
