@@ -1,4 +1,3 @@
-import { HomeIcon } from "@heroicons/react/20/solid";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -24,8 +23,9 @@ export function FoldersNav(props: Props) {
       <div className={c("flex")}>
         <button
           className={c(
-            "mr-1 mb-px cursor-default select-none items-center rounded-md py-1 px-1.5 text-sm font-semibold text-slate-500 hover:bg-slate-50",
-            "flex flex-1"
+            "mr-2.5 mb-px cursor-default select-none items-center rounded-md py-1 px-1.5 text-sm font-semibold text-slate-500 hover:bg-slate-50",
+            "flex flex-1",
+            !props.currentFolder ? "bg-slate-100 text-slate-600" : undefined
           )}
           onClick={() => props.setCurrentFolder()}
         >

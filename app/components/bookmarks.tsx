@@ -17,7 +17,7 @@ export function Bookmarks({
   select,
   deselect,
 }: Props) {
-  const [includeSubfolders, setIncludeSubfolders] = useState(true);
+  const [includeSubfolders, setIncludeSubfolders] = useState(false);
   const [searchPhrase, setSearchPhrase] = useState("");
 
   let displayedBookmarks = !currentFolder
