@@ -12,7 +12,12 @@ export function BookmarkSelection({ selectedBookmarks, reset }: Props) {
   return (
     <>
       <div className="flex justify-between">
-        <h2>Selected</h2>
+        <h2>
+          <span className="mr-1.5 inline-flex h-[34px] items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-800">
+            {selectedBookmarks.length}
+          </span>
+          Selected
+        </h2>
         <button onClick={reset}>Clear</button>
       </div>
 

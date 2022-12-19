@@ -55,14 +55,14 @@ export function Layout({ header, nav, main, aside }: Props) {
 
         <aside
           className={c(
-            "todo",
+            "h-max-full overflow-y-auto py-3 px-3.5",
             "hidden border-l",
             "border-gray-200 bg-slate-100",
             "md:col-span-4 md:block",
             "xl:col-span-3"
           )}
         >
-          <div className={c("sticky top-4 space-y-4")}>{aside}</div>
+          <div className={c("sticky space-y-2")}>{aside}</div>
         </aside>
       </div>
     </div>
