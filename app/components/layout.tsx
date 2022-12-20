@@ -62,7 +62,7 @@ export function Layout({ header, nav, main, aside }: Props) {
             "xl:col-span-3"
           )}
         >
-          <div className={c("sticky space-y-2")}>{aside}</div>
+          {aside}
         </aside>
       </div>
     </div>
