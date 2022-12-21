@@ -8,7 +8,7 @@
     "dev": "run-p dev:*",
     "dev:css": "npm run generate:css -- --watch",
     "dev:remix": "remix dev",
-    "generate:css": "tailwindcss -o ./app/root.css",
+    "generate:css": "tailwindcss -i ./app/root.tailwind.css -o ./app/root.css",
     "start": "remix-serve build",
     "format": "prettier --write ./app/**/*.{ts,tsx}",
     "lint": "run-s lint:*",

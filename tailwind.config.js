@@ -1,8 +1,6 @@
-const plugin = require("tailwindcss/plugin");
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./app/**/*.tsx"],
+  content: ["./app/**/*.tsx", "./app/root.tailwind.css"],
   theme: {
     extend: {
       height: {
@@ -14,14 +12,5 @@ module.exports = {
   plugins: [
     require("@tailwindcss/aspect-ratio"),
     require("@tailwindcss/forms"),
-    plugin(function ({ addUtilities }) {
-      addUtilities({
-        ".todo": {
-          outline: "2px dashed deeppink",
-          outlineOffset: "-1px",
-          opacity: 0.5,
-        },
-      });
-    }),
   ],
 };
