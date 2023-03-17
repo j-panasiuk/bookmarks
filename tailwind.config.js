@@ -9,8 +9,8 @@ module.exports = {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],
       },
       height: {
-        "app/header": "3rem",
-        "app/main": "calc(100vh - 3rem)",
+        "app/header": "3.75rem",
+        "app/main": "calc(100vh - 3.75rem)",
       },
     },
   },
