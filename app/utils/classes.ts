@@ -2,6 +2,8 @@ export function classes(...names: (string | undefined)[]): string {
   return names.filter(isNonEmpty).map(trim).join(" ");
 }
 
+export const c = classes;
+
 function isNonEmpty(val: string | undefined): val is string {
   return Boolean(val);
 }
