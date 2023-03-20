@@ -83,6 +83,13 @@ export function Bookmarks({
           >
             <BookmarkIcon bookmark={bookmark} />
             {bookmark.title}
+            <a
+              className="ml-2 text-sm text-indigo-300"
+              href={bookmark.href}
+              target="_blank"
+            >
+              {bookmark.href}
+            </a>
           </Item>
         ))}
       </ul>
