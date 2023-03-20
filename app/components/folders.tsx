@@ -4,10 +4,31 @@ import {
   type DetailedHTMLProps,
   type MouseEventHandler,
   useState,
+  useCallback,
 } from "react";
 import type { Folder } from "~/bookmarks.types";
-import { getItemId, isSameAs } from "~/bookmarks.utils";
+import { getItemId, getItemPath, isSameAs } from "~/bookmarks.utils";
 import { c } from "~/utils/classes";
+
+function useExpandableTree() {
+  const [expandedPaths, setExpanded] = useState<string[]>([]);
+
+  const toggleFolder = useCallback((folder?: Folder<Folder>) => {
+    if (folder === undefined) {
+      return setExpanded([]);
+    }
+
+    const folderPath = getItemPath(folder);
+
+    setExpanded((exp) => {
+      return exp.includes(folderPath)
+        ? exp.filter((path) => !path.startsWith(folderPath))
+        : exp.concat(folderPath);
+    });
+  }, []);
+
+  return { expandedPaths, toggleFolder } as const;
+}
 
 type Props = {
   folders: Folder<Folder>[];
@@ -16,14 +37,14 @@ type Props = {
 };
 
 export function FoldersNav(props: Props) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { expandedPaths, toggleFolder } = useExpandableTree();
 
   return (
     <div>
       <div className={c("flex")}>
         <FolderIconButton
-          onClick={() => setIsExpanded((exp) => !exp)}
-          isOpen={isExpanded}
+          onClick={() => toggleFolder()}
+          isOpen={expandedPaths.length > 0}
         />
         <FolderLabelButton
           onClick={() => props.setCurrentFolder()}
@@ -32,12 +53,17 @@ export function FoldersNav(props: Props) {
         />
       </div>
 
-      <Folders level={0} {...props} />
+      <Folders
+        level={0}
+        expandedPaths={expandedPaths}
+        toggleFolder={toggleFolder}
+        {...props}
+      />
     </div>
   );
 }
 
-interface FoldersProps extends Props {
+interface FoldersProps extends Props, ReturnType<typeof useExpandableTree> {
   level: number;
 }
 
@@ -58,17 +84,20 @@ interface FolderProps extends FoldersProps {
 function Folder({
   level,
   folder,
+  expandedPaths,
+  toggleFolder,
   currentFolder,
   setCurrentFolder,
 }: FolderProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const folderPath = getItemPath(folder);
+  const isOpen = expandedPaths.includes(folderPath);
   const isSelected = isFolderSelected(folder, currentFolder);
 
   return (
-    <li key={getItemId(folder)}>
+    <li key={folderPath}>
       <div className={c("flex")}>
         <FolderIconButton
-          onClick={() => setIsOpen((open) => !open)}
+          onClick={() => toggleFolder(folder)}
           isOpen={isOpen}
         />
         <FolderLabelButton
@@ -81,6 +110,8 @@ function Folder({
         <Folders
           level={level + 1}
           folders={folder.children as Folder<Folder>[]}
+          expandedPaths={expandedPaths}
+          toggleFolder={toggleFolder}
           setCurrentFolder={setCurrentFolder}
           currentFolder={currentFolder}
         />
@@ -102,11 +133,10 @@ function FolderIconButton({ isOpen, ...buttonProps }: FolderIconButtonProps) {
   const Icon = isOpen ? FolderOpenIcon : FolderIcon;
 
   return (
-    <button {...buttonProps}>
+    <button className={c("rounded", "hover:bg-slate-700")} {...buttonProps}>
       <Icon
         className={c(
           "mx-2 h-5 w-5 stroke-2",
-          "hover:bg-slate-700",
           isOpen ? "stroke-slate-100" : "stroke-slate-400"
         )}
       />
