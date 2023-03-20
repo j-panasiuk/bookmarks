@@ -1,9 +1,5 @@
 import { FolderIcon, FolderOpenIcon } from "@heroicons/react/24/outline";
-import type {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
-  MouseEventHandler,
-} from "react";
+import type { ButtonHTMLAttributes, MouseEventHandler } from "react";
 import type { Folder } from "~/bookmarks.types";
 import { getItemId, getItemPath, isSameAs } from "~/bookmarks.utils";
 import { type FoldersTree, useFoldersTree } from "~/folders.tree";
@@ -100,10 +96,7 @@ function Folder({
 }
 
 interface FolderIconButtonProps
-  extends DetailedHTMLProps<
-    ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > {
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: MouseEventHandler<HTMLButtonElement>;
   isOpen: boolean;
 }
@@ -124,10 +117,7 @@ function FolderIconButton({ isOpen, ...buttonProps }: FolderIconButtonProps) {
 }
 
 interface FolderLabelButtonProps
-  extends DetailedHTMLProps<
-    ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > {
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: MouseEventHandler<HTMLButtonElement>;
   label: string;
   isCurrent: boolean;
