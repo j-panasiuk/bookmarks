@@ -1,43 +1,22 @@
 import { FolderIcon, FolderOpenIcon } from "@heroicons/react/24/outline";
-import {
-  type ButtonHTMLAttributes,
-  type DetailedHTMLProps,
-  type MouseEventHandler,
-  useState,
-  useCallback,
+import type {
+  ButtonHTMLAttributes,
+  DetailedHTMLProps,
+  MouseEventHandler,
 } from "react";
 import type { Folder } from "~/bookmarks.types";
 import { getItemId, getItemPath, isSameAs } from "~/bookmarks.utils";
+import { type FoldersTree, useFoldersTree } from "~/folders.tree";
 import { c } from "~/utils/classes";
 
-function useExpandableTree() {
-  const [expandedPaths, setExpanded] = useState<string[]>([]);
-
-  const toggleFolder = useCallback((folder?: Folder<Folder>) => {
-    if (folder === undefined) {
-      return setExpanded([]);
-    }
-
-    const folderPath = getItemPath(folder);
-
-    setExpanded((exp) => {
-      return exp.includes(folderPath)
-        ? exp.filter((path) => !path.startsWith(folderPath))
-        : exp.concat(folderPath);
-    });
-  }, []);
-
-  return { expandedPaths, toggleFolder } as const;
-}
-
-type Props = {
+type FoldersNavProps = {
   folders: Folder<Folder>[];
   setCurrentFolder: (f?: Folder) => void;
   currentFolder?: Folder;
 };
 
-export function FoldersNav(props: Props) {
-  const { expandedPaths, toggleFolder } = useExpandableTree();
+export function FoldersNav(props: FoldersNavProps) {
+  const { expandedPaths, toggleFolder } = useFoldersTree();
 
   return (
     <div>
@@ -63,7 +42,7 @@ export function FoldersNav(props: Props) {
   );
 }
 
-interface FoldersProps extends Props, ReturnType<typeof useExpandableTree> {
+interface FoldersProps extends FoldersNavProps, FoldersTree {
   level: number;
 }
 
@@ -163,7 +142,7 @@ function FolderLabelButton({
     <button
       {...buttonProps}
       className={c(
-        "mb-px flex select-none items-center rounded-md py-1 px-2",
+        "ml-px mb-px flex select-none items-center rounded-md py-1 px-2",
         "flex flex-1",
         isCurrent ? "bg-slate-600" : "hover:bg-slate-700"
       )}
