@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type HTMLProps, useState } from "react";
+import type { ButtonHTMLAttributes, HTMLProps } from "react";
 import type { Bookmark, Folder } from "~/bookmarks.types";
 import { getItemId, isInside, isTopLevel } from "~/bookmarks.utils";
 import { c } from "~/utils/classes";
@@ -23,7 +23,6 @@ export function Bookmarks({
   bookmarksSelection,
 }: BookmarksProps) {
   const lg = useIsLargeDevice();
-
   const includeSubfolders = searchPhrase.length > 0;
 
   let displayedFolders = lg
@@ -48,20 +47,20 @@ export function Bookmarks({
 
   return (
     <>
-      <div className={c("h-14 bg-white", "flex justify-between")}>
-        <div className="flex items-center space-x-1.5 px-2">
+      <div className={c("fixed right-[13px] top-16", "flex justify-between")}>
+        <div className="flex items-center space-x-1.5">
           <Button
             onClick={() => bookmarksSelection.deselect(displayedBookmarks)}
           >
-            Deselect all
+            - Deselect all
           </Button>
           <Button onClick={() => bookmarksSelection.select(displayedBookmarks)}>
-            Select all
+            + Select all
           </Button>
         </div>
       </div>
 
-      <ul className="pt-px">
+      <ul>
         {displayedFolders.map((folder) => (
           <Item
             key={getItemId(folder)}
@@ -98,8 +97,8 @@ function Button({
   return (
     <button
       className={c(
-        "inline-flex items-center border px-3 py-2",
-        "rounded-md border-gray-300 bg-white text-sm font-medium leading-4 text-gray-700 shadow-sm",
+        "flex h-8 items-center border px-3",
+        "rounded border-gray-300 bg-white text-sm font-medium leading-4 text-gray-700 shadow-sm",
         "hover:bg-gray-50",
         "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
         className

@@ -3,15 +3,18 @@ import type { Folder } from "~/bookmarks.types";
 import { getItemId } from "~/bookmarks.utils";
 import { c } from "~/utils/classes";
 
-type Props = {
+type BreadcrumbsProps = {
   breadcrumbs: Folder[];
   setCurrentFolder: (folder?: Folder) => void;
 };
 
-export function Breadcrumbs({ breadcrumbs, setCurrentFolder }: Props) {
+export function Breadcrumbs({
+  breadcrumbs,
+  setCurrentFolder,
+}: BreadcrumbsProps) {
   return (
     <nav
-      className={c("flex h-10 rounded border border-gray-300")}
+      className={c("flex h-10 justify-between rounded border border-gray-300")}
       aria-label="Breadcrumb"
     >
       <ol className="flex w-full">
