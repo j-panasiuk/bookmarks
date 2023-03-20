@@ -1,7 +1,7 @@
 import { FolderOpenIcon } from "@heroicons/react/24/outline";
 import type { Folder } from "~/bookmarks.types";
 import { getItemId } from "~/bookmarks.utils";
-import { classes as c } from "~/utils/classes";
+import { c } from "~/utils/classes";
 
 type Props = {
   breadcrumbs: Folder[];
@@ -10,21 +10,22 @@ type Props = {
 
 export function Breadcrumbs({ breadcrumbs, setCurrentFolder }: Props) {
   return (
-    <nav className={c("flex")} aria-label="Breadcrumb">
-      <ol className="mx-auto flex w-full max-w-screen-xl space-x-4 px-5">
+    <nav
+      className={c("flex h-10 rounded border border-gray-300")}
+      aria-label="Breadcrumb"
+    >
+      <ol className="flex w-full">
         <li className="flex">
-          <div className="flex items-center">
-            <button
-              type="button"
-              className="flex items-center whitespace-nowrap"
-              onClick={() => setCurrentFolder()}
-            >
-              <FolderOpenIcon
-                className="h-5 w-5 flex-shrink-0 text-gray-400 hover:text-gray-500"
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+          <button
+            type="button"
+            className="flex h-full w-10 items-center justify-center whitespace-nowrap"
+            onClick={() => setCurrentFolder()}
+          >
+            <FolderOpenIcon
+              className="h-5 w-5 flex-shrink-0 text-gray-400 hover:text-gray-500"
+              aria-hidden="true"
+            />
+          </button>
         </li>
         {breadcrumbs.map((b) => (
           <li key={getItemId(b)} className="flex">
@@ -40,7 +41,7 @@ export function Breadcrumbs({ breadcrumbs, setCurrentFolder }: Props) {
               </svg>
               <button
                 type="button"
-                className="ml-4 whitespace-nowrap text-sm font-medium text-gray-500 hover:text-gray-700"
+                className="h-full whitespace-nowrap pl-3 pr-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                 onClick={() => setCurrentFolder(b)}
               >
                 {b.title}

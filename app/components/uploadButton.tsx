@@ -28,11 +28,11 @@ export function UploadButton() {
     >
       <label
         className={c(
-          "mx-auto inline-flex h-14 items-center rounded-sm border px-5 py-3",
+          "mx-auto inline-flex h-12 items-center rounded border px-5",
           "text-base font-medium transition-colors",
           isPending
             ? "border-none text-indigo-300"
-            : "border-dashed border-white text-white hover:border-indigo-100 hover:text-indigo-100"
+            : "border border-indigo-400 text-white hover:border-white"
         )}
       >
         <span className="inline-flex items-center justify-between">
@@ -44,7 +44,10 @@ export function UploadButton() {
             </>
           ) : (
             <>
-              <DocumentPlusIcon className="mr-2 h-6 w-6" aria-hidden="true" />
+              <DocumentPlusIcon
+                className="-ml-0.5 mr-2.5 h-6 w-6"
+                aria-hidden="true"
+              />
               Upload bookmarks file
             </>
           )}
