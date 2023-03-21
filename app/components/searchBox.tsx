@@ -38,3 +38,11 @@ export function SearchBox({ searchPhrase, setSearchPhrase }: Props) {
     </div>
   );
 }
+
+export function SearchOptions() {
+  return (
+    <div className="flex h-8 items-center justify-end px-2 text-sm">
+      Search advanced options...{/** TODO */}
+    </div>
+  );
+}

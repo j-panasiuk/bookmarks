@@ -1,75 +1,54 @@
-import { type ActionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
-import { useBreadcrumbs } from "~/bookmarks.breadcrumbs";
-import { getBookmarksHtml } from "~/bookmarks.file";
-import { parseBookmarks, parseFolderTree } from "~/bookmarks.parser.server";
-import type { Bookmark } from "~/bookmarks.types";
-import { isSameAs } from "~/bookmarks.utils";
-import { cache } from "~/cache.server";
-import { Bookmarks } from "~/components/bookmarks";
-import { BookmarkSelection } from "~/components/bookmarkSelection";
-import { Breadcrumbs } from "~/components/breadcrumbs";
+import { type ActionArgs, redirect, LoaderArgs, json } from "@remix-run/node";
+import { Link, useActionData, useCatch } from "@remix-run/react";
+import { getMostRecentFileName, saveFile } from "~/bookmarks.file";
+import {
+  assertFile,
+  assertFileName,
+  EXAMPLE_FILE_NAME,
+  withoutExtension,
+} from "~/bookmarks.file.utils";
 import { Fallback } from "~/components/fallback";
-import { FoldersNav } from "~/components/folders";
-import Header from "~/components/header";
-import { Layout } from "~/components/layout";
-import { assert } from "~/utils/assert";
-import { classes as c } from "~/utils/classes";
-import { readTextFile } from "~/utils/file";
-import { useSelection } from "~/utils/selection";
-import { getBookmarksFilePath } from "./index.fs";
+import { c } from "~/utils/classes";
+import { log, logError, logSuccess, logWarning } from "~/utils/console";
+import { UploadButton } from "~/components/uploadButton";
+import { useToast } from "~/components/toasts";
+import { useEffect } from "react";
 
 // --- IMPORT BOOKMARKS FILE ---
 
 export async function action({ request }: ActionArgs) {
-  const payload = Object.fromEntries(await request.formData());
+  log("action /");
+  try {
+    const payload = Object.fromEntries(await request.formData());
 
-  if (payload.file instanceof File) {
-    const fileName = payload.file.name;
-    const html = await getBookmarksHtml(payload.file);
+    assertFile(payload.file);
+    assertFileName(payload.file.name);
 
-    cache.fileName = fileName;
-    cache.html = html;
-    delete cache.bookmarks;
-    delete cache.folders;
+    await saveFile(payload.file);
 
-    return new Response(null, { status: 201 });
+    logSuccess("action / saved", payload.file.name);
+    return redirect(`/${withoutExtension(payload.file.name)}`);
+  } catch (err) {
+    logError("action /", (err as any)?.message);
+    return new Response("Failed to upload bookmarks file", { status: 400 });
   }
-
-  throw new Response("Failed to upload bookmarks file", { status: 400 });
 }
 
 // --- READ BOOKMARKS FILE ---
 
-export async function loader() {
+export async function loader({ request }: LoaderArgs) {
+  log("loader", request.url);
   try {
-    let { fileName, html, bookmarks, folders } = cache;
+    const fileName: any = undefined;
+    // const fileName = await getMostRecentFileName();
 
-    if (!fileName) {
-      fileName = await getBookmarksFilePath();
-      assert(fileName, "Failed to find bookmarks file", 404);
-      cache.fileName = fileName;
+    if (fileName) {
+      return redirect(`/${withoutExtension(fileName)}`);
     }
 
-    if (!html) {
-      html = await readTextFile(fileName);
-      assert(html, "Failed to read bookmarks file", 404);
-      cache.html = html;
-    }
-
-    if (!bookmarks) {
-      bookmarks = parseBookmarks(html);
-      cache.bookmarks = bookmarks;
-    }
-
-    if (!folders) {
-      folders = parseFolderTree(html);
-      cache.folders = folders;
-    }
-
-    return json({ fileName, bookmarks, folders });
+    return new Response("", { status: 200 });
   } catch (err) {
-    console.log("loader/err", err);
+    logError("loader /", (err as any)?.message);
 
     throw new Response(
       err instanceof Error ? err.message : "Failed to load bookmarks",
@@ -83,110 +62,46 @@ export async function loader() {
   }
 }
 
-export default function IndexRoute() {
-  const { fileName, bookmarks, folders } = useLoaderData<typeof loader>();
-  const [breadcrumbs, setCurrentFolder] = useBreadcrumbs(folders);
-  const [selectedBookmarks, selectionActions] = useSelection<Bookmark>({
-    eq: isSameAs,
-  });
+export default function WelcomeScreen() {
+  const actionData = useActionData<typeof action>();
+  const toast = useToast();
 
-  const currentFolder = breadcrumbs.at(-1);
-
-  return (
-    <Layout
-      header={<Header fileName={fileName} />}
-      nav={
-        <FoldersNav
-          folders={folders}
-          currentFolder={currentFolder}
-          setCurrentFolder={setCurrentFolder}
-        />
-      }
-      main={
-        <Bookmarks
-          bookmarks={bookmarks}
-          currentFolder={currentFolder}
-          {...selectionActions}
-        />
-      }
-      aside={
-        <BookmarkSelection
-          selectedBookmarks={selectedBookmarks}
-          {...selectionActions}
-        />
-      }
-    />
-  );
-}
-
-function WelcomeScreen() {
-  const action = useActionData();
-  // TODO handle file uploading state
-  // TODO handle file upload failure
-
-  const onFileChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    if (ev.target.files?.length) {
-      document.forms.item(0)?.submit();
+  useEffect(() => {
+    if (typeof actionData === "string") {
+      toast({ message: actionData });
     }
-  };
+  }, [toast, actionData]);
 
   return (
-    <div className={c("min-h-screen bg-indigo-400 p-4")}>
-            <Form
-              method="post"
-              encType="multipart/form-data"
-        className={c("flex flex-col items-center space-y-4 p-4")}
-            >
-              <h2
-                className={c(
-                  "text-3xl font-bold tracking-tight text-white",
-                  "sm:text-4xl"
-                )}
-              >
-                <span className="block">Welcome to Bookmarks App</span>
-              </h2>
-              <label
-                className={c(
-            "mx-auto inline-flex items-center rounded-md border border-transparent px-5 py-3",
-                  "bg-white text-base font-medium text-indigo-600 shadow",
-                  "hover:bg-indigo-50"
-                )}
-              >
-          <span className="inline-flex items-center justify-between">
-            <DocumentPlusIcon
-              className="mr-2 h-6 w-6 text-gray-400"
-              aria-hidden="true"
-            />
-            Upload bookmarks file
-          </span>
-                <input
-                  type="file"
-                  name="file"
-                  accept=".html"
-                  className="hidden"
-            onChange={onFileChange}
-                />
-              </label>
-            </Form>
+    <div
+      className={c(
+        "flex min-h-screen flex-col items-center space-y-4 bg-indigo-400 p-4 text-white"
+      )}
+    >
+      <h2
+        className={c(
+          "text-3xl font-bold tracking-tight text-white",
+          "sm:text-4xl"
+        )}
+      >
+        <span className="block">Welcome to Bookmarks App</span>
+      </h2>
+      <UploadButton />
+      <div> -- or -- </div>
+      <Link to={`/${withoutExtension(EXAMPLE_FILE_NAME)}`}>
+        See example file
+      </Link>
     </div>
   );
 }
 
 export function CatchBoundary() {
   const caught = useCatch();
-  console.warn(caught);
-
-  switch (caught.status) {
-    case 404:
-      return <WelcomeScreen />;
-    default:
-      throw new Error(
-        `Unexpected caught response with status: ${caught.status}`
-      );
-  }
+  logWarning(caught);
+  return <Fallback title="Upload error" error={caught.data} />;
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.warn(error);
-  return <Fallback title="Something went wrong" error={error.message} />;
+  logWarning(error);
+  return <Fallback title="Unexpected error" error={error.message} />;
 }

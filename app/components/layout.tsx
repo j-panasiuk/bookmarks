@@ -1,70 +1,75 @@
-import { classes as c } from "~/utils/classes";
+import { c } from "~/utils/classes";
+import { useIsLargeDevice } from "~/utils/responsive";
 
 type Props = {
   header: JSX.Element;
-  nav: JSX.Element;
-  main: JSX.Element;
-  aside?: JSX.Element;
+  breadcrumbs?: JSX.Element;
+  search?: JSX.Element;
+  sidebar?: JSX.Element;
+  results?: JSX.Element;
+  panel?: JSX.Element;
 };
 
-export function Layout({ header, nav, main, aside }: Props) {
+export function Layout({
+  header,
+  breadcrumbs,
+  search,
+  sidebar,
+  results,
+  panel,
+}: Props) {
+  const lg = useIsLargeDevice();
+
   return (
     <div className={c("min-h-screen", "bg-white")}>
-      <div
+      <header
         className={c(
-          "md:grid md:grid-cols-12",
-          "items-center justify-center",
-          "mx-auto h-app/header",
-          "border-b border-gray-200"
+          "flex flex-row items-center justify-between",
+          "h-app/header px-2",
+          "bg-indigo-600 text-white"
         )}
       >
-        <div
+        {header}
+      </header>
+
+      <main className={c("mx-auto h-app/main", "md:grid md:grid-cols-3")}>
+        <section
           className={c(
             "hidden",
-            "xl:col-span-3 xl:block",
-            "h-full border-r border-gray-200"
+            "lg:col-span-1 lg:flex lg:flex-col",
+            "bg-slate-800 text-white"
           )}
-        ></div>
-        {header}
-      </div>
-
-      <div className={c("mx-auto h-app/main", "md:grid md:grid-cols-12")}>
-        <aside className={c("hidden", "xl:col-span-3 xl:block")}>
+        >
           <nav
             aria-label="Sidebar"
             className={c(
               "sticky top-0",
-              "h-max-full overflow-y-auto py-3 px-3.5",
+              "max-h-full space-y-2 overflow-y-auto p-2",
+              "flex flex-1 flex-col",
               "border-r border-gray-200"
             )}
           >
-            {nav}
+            {lg ? search : null}
+            {sidebar}
           </nav>
-        </aside>
+        </section>
 
-        <main
+        <section
           className={c(
-            "h-max-full overflow-y-auto py-3 px-3.5",
+            "max-h-full space-y-2 overflow-y-auto p-2",
+            "flex flex-1 flex-col",
             "bg-slate-100",
-            "md:col-span-8",
-            "xl:col-span-6"
+            "col-span-full",
+            "lg:col-span-2"
           )}
         >
-          {main}
-        </main>
+          {lg ? null : search}
+          {breadcrumbs}
+          {results}
+        </section>
+      </main>
 
-        <aside
-          className={c(
-            "h-max-full overflow-y-auto py-3 px-3.5",
-            "hidden border-l",
-            "border-gray-200 bg-slate-100",
-            "md:col-span-4 md:block",
-            "xl:col-span-3"
-          )}
-        >
-          {aside}
-        </aside>
-      </div>
+      {panel}
     </div>
   );
 }

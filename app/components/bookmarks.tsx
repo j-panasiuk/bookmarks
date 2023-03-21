@@ -47,7 +47,10 @@ export function Bookmarks({
 
   return (
     <>
-      <div className={c("fixed right-[13px] top-16", "flex justify-between")}>
+      <div className={c("flex h-8 items-center justify-between")}>
+        <div className="px-2 text-sm">
+          Display & Selection options...{/** TODO */}
+        </div>
         <div className="flex items-center space-x-1.5">
           <Button
             onClick={() => bookmarksSelection.deselect(displayedBookmarks)}

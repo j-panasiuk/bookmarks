@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 
-export function useMediaQuery(query: string): boolean {
+export function useIsLargeDevice() {
+  return useMediaQuery("(min-width: 1024px)");
+}
+
+function useMediaQuery(query: string, defaultMatches: boolean = true): boolean {
   const getMatches = (query: string): boolean => {
     // Prevents SSR issues
     if (typeof window !== "undefined") {
       return window.matchMedia(query).matches;
     }
-    return false;
+    return defaultMatches;
   };
 
   const [matches, setMatches] = useState<boolean>(getMatches(query));

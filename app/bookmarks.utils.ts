@@ -7,7 +7,7 @@ export function getItemId(val: Pick<Item, "title" | "addDate">): ItemId {
   return `${val.title}${_}${Math.abs(val.addDate)}`;
 }
 
-function getItemPath(item: Item): string {
+export function getItemPath(item: Item): string {
   return joinPath(item.parentFolders.concat(getItemId(item)));
 }
 
