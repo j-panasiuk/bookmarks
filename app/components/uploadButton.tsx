@@ -1,6 +1,6 @@
 import { type ChangeEventHandler, useCallback, useRef } from "react";
 import { Form, useNavigation } from "@remix-run/react";
-import { DocumentPlusIcon } from "@heroicons/react/24/outline";
+import { FolderPlusIcon } from "@heroicons/react/24/outline";
 import { FILE_EXTENSION } from "~/bookmarks.file.utils";
 import { c } from "~/utils/classes";
 
@@ -28,11 +28,11 @@ export function UploadButton() {
     >
       <label
         className={c(
-          "mx-auto inline-flex h-12 items-center rounded border px-5",
+          "mx-auto inline-flex h-12 items-center rounded px-5",
           "text-base font-medium transition-colors",
           isPending
-            ? "border-none text-indigo-300"
-            : "border border-indigo-400 text-white hover:border-white"
+            ? "bg-transparent text-indigo-300"
+            : "bg-black bg-opacity-20 text-white hover:bg-opacity-30"
         )}
       >
         <span className="inline-flex items-center justify-between">
@@ -44,11 +44,11 @@ export function UploadButton() {
             </>
           ) : (
             <>
-              <DocumentPlusIcon
+              <FolderPlusIcon
                 className="-ml-0.5 mr-2.5 h-6 w-6"
                 aria-hidden="true"
               />
-              Upload bookmarks file
+              Upload bookmarks
             </>
           )}
         </span>

@@ -17,7 +17,7 @@ export function Breadcrumbs({
       className={c("flex h-10 justify-between rounded border border-gray-300")}
       aria-label="Breadcrumb"
     >
-      <ol className="flex w-full">
+      <ol className="flex h-10 w-full">
         <li className="flex">
           <button
             type="button"

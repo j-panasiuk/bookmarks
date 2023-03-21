@@ -77,8 +77,8 @@ export function Bookmarks({
             onClick={() => bookmarksSelection.select(bookmark)}
             className={c(
               bookmarksSelection.isSelected(bookmark)
-                ? "bg-indigo-600 text-white"
-                : "hover:bg-slate-200"
+                ? "bg-indigo-50"
+                : "hover:bg-indigo-50"
             )}
           >
             <BookmarkIcon bookmark={bookmark} />
