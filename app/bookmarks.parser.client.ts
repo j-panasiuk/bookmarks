@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 import type { Bookmark, BookmarkItem, Folder } from "~/bookmarks.types";
 
+/**
+ * @deprecated
+ * Use server parser instead
+ */
 export function useBookmarkTree(html: string) {
   const tree = useMemo(() => {
     if (typeof document !== "undefined" && typeof DOMParser === "function") {
@@ -14,6 +18,10 @@ export function useBookmarkTree(html: string) {
 
 // --- CLIENT SIDE PARSER ---
 
+/**
+ * @deprecated
+ * Use server parser instead
+ */
 export function getBookmarkTree(dom: Document): BookmarkItem[] {
   const root = dom.querySelector("dl dt dl");
   if (root instanceof HTMLDListElement) {

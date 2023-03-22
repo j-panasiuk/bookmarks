@@ -3,8 +3,9 @@ import { by, splitBy } from "~/utils/array";
 import type { Bookmark, Folder, ItemId } from "./bookmarks.types";
 import { getFolderLevel, getItemId, joinPath } from "./bookmarks.utils";
 import { folders as f, bookmarks as b } from "./bookmarks.mock";
+import { type FileContent } from "./bookmarks.file.utils";
 
-export function parseBookmarks(html: string): Bookmark[] {
+export function parseBookmarks(html: FileContent): Bookmark[] {
   const $ = load(html);
 
   let bookmarks: Bookmark[] = [];
@@ -23,7 +24,7 @@ export function parseBookmarks(html: string): Bookmark[] {
   return bookmarks;
 }
 
-export function parseFolders(html: string): Folder[] {
+export function parseFolders(html: FileContent): Folder[] {
   const $ = load(html);
 
   let folders: Folder[] = [];
@@ -43,7 +44,7 @@ export function parseFolders(html: string): Folder[] {
   return folders;
 }
 
-export function parseFolderTree(html: string): Folder<Folder>[] {
+export function parseFolderTree(html: FileContent): Folder<Folder>[] {
   return buildTree(parseFolders(html));
 }
 
