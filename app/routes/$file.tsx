@@ -10,6 +10,10 @@ import { isSameAs } from "~/bookmarks.utils";
 import { Layout } from "~/components/layout";
 import { NavigationMenu } from "~/components/navigationMenu";
 import { UploadButton } from "~/components/uploadButton";
+import {
+  SelectionPanel,
+  SelectionPanelButton,
+} from "~/components/selectionPanel";
 import { SearchBox, SearchOptions } from "~/components/searchBox";
 import { FoldersNav } from "~/components/folders";
 import { Breadcrumbs } from "~/components/breadcrumbs";
@@ -18,7 +22,6 @@ import { assertExists } from "~/utils/assert";
 import { c } from "~/utils/classes";
 import { useSelection } from "~/utils/selection";
 import { log, logError } from "~/utils/console";
-import { SelectionPanel } from "~/components/selectionPanel";
 
 // --- READ BOOKMARKS FILE ---
 
@@ -84,9 +87,12 @@ export default function BookmarksFileRoute() {
             <UploadButton />
           </Row>
           <Row>
-            <button onClick={() => setPanelIsOpen(true)}>
-              Selected: {selectedBookmarks.length}
-            </button>
+            {selectedBookmarks.length > 0 ? (
+              <SelectionPanelButton
+                selectedCount={selectedBookmarks.length}
+                setOpen={setPanelIsOpen}
+              />
+            ) : null}
           </Row>
         </>
       }

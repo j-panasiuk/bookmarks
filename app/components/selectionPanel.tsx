@@ -101,3 +101,25 @@ export function SelectionPanel({ open, setOpen, selectedBookmarks }: Props) {
     </Transition.Root>
   );
 }
+
+type ButtonProps = {
+  selectedCount: number;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+export function SelectionPanelButton({ selectedCount, setOpen }: ButtonProps) {
+  return (
+    <button
+      onClick={() => setOpen(true)}
+      className={c(
+        "inline-flex h-12 w-full items-center justify-center rounded-md bg-black bg-opacity-20 px-5 text-base font-medium text-white",
+        "hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+      )}
+    >
+      Selected
+      <span className="ml-2.5 -mr-1 min-w-[2rem] rounded-lg bg-white px-2 py-0.5 font-bold text-indigo-600">
+        {selectedCount}
+      </span>
+    </button>
+  );
+}
