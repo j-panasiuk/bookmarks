@@ -39,8 +39,7 @@ export async function action({ request }: ActionArgs) {
 export async function loader({ request }: LoaderArgs) {
   log("loader", request.url);
   try {
-    const fileName: any = undefined;
-    // const fileName = await getMostRecentFileName();
+    const fileName = await getMostRecentFileName();
 
     if (fileName) {
       return redirect(`/${withoutExtension(fileName)}`);
