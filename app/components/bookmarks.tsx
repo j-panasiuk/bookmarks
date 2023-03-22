@@ -4,6 +4,7 @@ import { getItemId, isInside, isTopLevel } from "~/bookmarks.utils";
 import { c } from "~/utils/classes";
 import type { SelectionActions } from "~/utils/selection";
 import { useIsLargeDevice } from "~/utils/responsive";
+import { shorten } from "~/links.utils";
 
 type BookmarksProps = {
   bookmarks: Bookmark[];
@@ -91,7 +92,7 @@ export function Bookmarks({
               href={bookmark.href}
               target="_blank"
             >
-              {bookmark.href}
+              {shorten(bookmark.href)}
             </a>
           </Item>
         ))}
