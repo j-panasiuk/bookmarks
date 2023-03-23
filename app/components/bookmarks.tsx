@@ -1,3 +1,4 @@
+import { FolderIcon } from "@heroicons/react/20/solid";
 import type { ButtonHTMLAttributes, HTMLProps } from "react";
 import type { Bookmark, Folder } from "~/bookmarks.types";
 import { getItemId, isInside, isTopLevel } from "~/bookmarks.utils";
@@ -71,7 +72,10 @@ export function Bookmarks({
             onClick={() => setCurrentFolder(folder)}
             className={c("hover:bg-slate-200")}
           >
-            {folder.title}
+            <button className={c("rounded", "hover:bg-slate-700")}>
+              <FolderIcon className={c("h-5 w-5 stroke-2", "fill-slate-300")} />
+            </button>
+            <ItemLabel>{folder.title}</ItemLabel>
           </Item>
         ))}
 
@@ -86,14 +90,16 @@ export function Bookmarks({
             )}
           >
             <BookmarkIcon bookmark={bookmark} />
-            {bookmark.title}
+            {bookmark.title ? <ItemLabel>{bookmark.title}</ItemLabel> : null}
+            <ItemLabel>
             <a
-              className="ml-2 text-sm text-indigo-300"
+                className="text-sm text-indigo-300"
               href={bookmark.href}
               target="_blank"
             >
               {shorten(bookmark.href)}
             </a>
+            </ItemLabel>
           </Item>
         ))}
       </ul>
@@ -123,12 +129,16 @@ function Item({ className, ...props }: HTMLProps<HTMLLIElement>) {
   return (
     <li
       className={c(
-        "mb-px flex select-none items-center rounded-md bg-white py-1 px-2",
+        "mb-px flex select-none items-center space-x-px rounded-md bg-white py-1 px-2",
         className
       )}
       {...props}
     />
   );
+}
+
+function ItemLabel({ className, ...props }: HTMLProps<HTMLLIElement>) {
+  return <span className={c("px-2", className)} {...props} />;
 }
 
 type BookmarkIconProps = {
@@ -140,7 +150,7 @@ function BookmarkIcon({ bookmark }: BookmarkIconProps) {
     <img
       src={bookmark.icon ?? ""}
       className={c(
-        "relative mr-2.5 h-5 w-5",
+        "relative h-5 w-5",
         !bookmark.icon
           ? "after:absolute after:top-0 after:left-0 after:z-10 after:h-5 after:w-5 after:bg-slate-100"
           : undefined

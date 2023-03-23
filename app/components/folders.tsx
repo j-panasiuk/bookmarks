@@ -1,4 +1,4 @@
-import { FolderIcon, FolderOpenIcon } from "@heroicons/react/24/outline";
+import { FolderIcon, FolderOpenIcon } from "@heroicons/react/20/solid";
 import type { ButtonHTMLAttributes, MouseEventHandler } from "react";
 import type { Folder } from "~/bookmarks.types";
 import { getItemId, getItemPath, isSameAs } from "~/bookmarks.utils";
@@ -109,7 +109,7 @@ function FolderIconButton({ isOpen, ...buttonProps }: FolderIconButtonProps) {
       <Icon
         className={c(
           "mx-2 h-5 w-5 stroke-2",
-          isOpen ? "stroke-slate-100" : "stroke-slate-400"
+          isOpen ? "fill-slate-100" : "fill-slate-400"
         )}
       />
     </button>
