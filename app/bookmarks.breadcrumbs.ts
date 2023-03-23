@@ -3,13 +3,16 @@ import type { Folder } from "./bookmarks.types";
 import { contains } from "./bookmarks.utils";
 import { folders as f } from "./bookmarks.mock";
 
-export function useBreadcrumbs(folders: Folder[], currentFolder?: Folder) {
-  const [breadcrumbs, setBreadcrumbs] = useState<Folder[]>(
+export function useBreadcrumbs(
+  folders: Folder<Folder>[],
+  currentFolder?: Folder<Folder>
+) {
+  const [breadcrumbs, setBreadcrumbs] = useState<Folder<Folder>[]>(
     getBreadcrumbs(folders, currentFolder)
   );
 
   const setCurrentFolder = useCallback(
-    (folder?: Folder) => {
+    (folder?: Folder<Folder>) => {
       setBreadcrumbs(getBreadcrumbs(folders, folder));
     },
     [folders]
@@ -18,7 +21,10 @@ export function useBreadcrumbs(folders: Folder[], currentFolder?: Folder) {
   return [breadcrumbs, setCurrentFolder] as const;
 }
 
-function getBreadcrumbs(folders: Folder[], currentFolder?: Folder): Folder[] {
+function getBreadcrumbs(
+  folders: Folder<Folder>[],
+  currentFolder?: Folder<Folder>
+): Folder<Folder>[] {
   if (currentFolder) {
     const containsCurrentFolder = contains(currentFolder);
     const parents = folders.filter(containsCurrentFolder);

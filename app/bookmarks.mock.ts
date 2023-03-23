@@ -8,7 +8,7 @@ import { mapEntries } from "~/utils/object";
  * folders['/A_'] // different folder, also named A
  * folders['/A/A'] // a subfolder
  */
-export const folders: Record<string, Folder> = mapEntries(
+export const folders: Record<string, Folder<Folder>> = mapEntries(
   {
     "/": { title: "Bookmarks bar" },
     "/A": { title: "A" },

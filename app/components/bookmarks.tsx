@@ -8,9 +8,9 @@ import { shorten } from "~/links.utils";
 
 type BookmarksProps = {
   bookmarks: Bookmark[];
-  folders: Folder[];
-  currentFolder?: Folder;
-  setCurrentFolder: (folder?: Folder) => void;
+  folders: Folder<Folder>[];
+  currentFolder?: Folder<Folder>;
+  setCurrentFolder: (folder?: Folder<Folder>) => void;
   searchPhrase: string;
   bookmarksSelection: SelectionActions<Bookmark>;
 };
@@ -28,9 +28,9 @@ export function Bookmarks({
 
   let displayedFolders = lg
     ? []
-    : !currentFolder
-    ? folders.filter(isTopLevel)
-    : folders.filter(isInside(currentFolder, false));
+    : currentFolder
+    ? (currentFolder.children as Folder<Folder>[])
+    : folders;
 
   let displayedBookmarks = !currentFolder
     ? includeSubfolders

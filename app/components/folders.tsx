@@ -7,8 +7,8 @@ import { c } from "~/utils/classes";
 
 type FoldersNavProps = {
   folders: Folder<Folder>[];
-  setCurrentFolder: (f?: Folder) => void;
-  currentFolder?: Folder;
+  setCurrentFolder: (f?: Folder<Folder>) => void;
+  currentFolder?: Folder<Folder>;
 };
 
 export function FoldersNav(props: FoldersNavProps) {

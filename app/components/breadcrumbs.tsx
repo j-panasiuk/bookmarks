@@ -4,8 +4,8 @@ import { getItemId } from "~/bookmarks.utils";
 import { c } from "~/utils/classes";
 
 type BreadcrumbsProps = {
-  breadcrumbs: Folder[];
-  setCurrentFolder: (folder?: Folder) => void;
+  breadcrumbs: Folder<Folder>[];
+  setCurrentFolder: (folder?: Folder<Folder>) => void;
 };
 
 export function Breadcrumbs({
