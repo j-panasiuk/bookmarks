@@ -1,6 +1,5 @@
 import { join } from "path";
 import { readdir, stat } from "fs/promises";
-import maxBy from "lodash.maxby";
 import { readTextFile, writeTextFile } from "~/utils/file";
 import {
   type FileName,
@@ -13,17 +12,28 @@ import {
   assertFileContent,
   assertFileName,
 } from "./bookmarks.file.utils";
-import { log } from "./utils/console";
+import { log, logWarning } from "./utils/console";
 
 export async function getMostRecentFileName(): Promise<FileName | undefined> {
   const fileNames = await getUploadedFileNames();
-  return maxBy(fileNames, async (fileName) => {
+
+  let mostRecent: FileName | undefined;
+  let mostRecentTime: number | undefined;
+
+  for (const fileName of fileNames) {
     try {
-      return (await stat(fileName)).mtime;
+      const filePath = getUploadedFilePath(fileName);
+      const { mtimeMs } = await stat(filePath);
+      if (mostRecentTime === undefined || mostRecentTime < mtimeMs) {
+        mostRecent = fileName;
+        mostRecentTime = mtimeMs;
+      }
     } catch {
-      return undefined;
+      logWarning("Failed to read file", fileName);
     }
-  });
+  }
+
+  return mostRecent;
 }
 
 export async function readFileContent(

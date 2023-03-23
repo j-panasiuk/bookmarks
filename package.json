@@ -23,7 +23,6 @@
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.12",
     "isbot": "^3.6.5",
-    "lodash.maxby": "^4.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -32,7 +31,6 @@
     "@remix-run/eslint-config": "^1.14.3",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.3",
-    "@types/lodash.maxby": "^4.6.7",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "cross-env": "^7.0.3",
