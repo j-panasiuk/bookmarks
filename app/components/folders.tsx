@@ -1,4 +1,5 @@
 import { FolderIcon, FolderOpenIcon } from "@heroicons/react/20/solid";
+import { FolderIcon as FolderOutlineIcon } from "@heroicons/react/24/outline";
 import type { ButtonHTMLAttributes, MouseEventHandler } from "react";
 import type { Folder } from "~/bookmarks.types";
 import { getItemId, getItemPath, isSameAs } from "~/bookmarks.utils";
@@ -67,12 +68,13 @@ function Folder({
   const folderPath = getItemPath(folder);
   const isOpen = expandedPaths.includes(folderPath);
   const isSelected = isFolderSelected(folder, currentFolder);
+  const hasChildren = folder.children.length > 0;
 
   return (
     <li key={folderPath}>
       <div className={c("flex")}>
         <FolderIconButton
-          onClick={() => toggleFolder(folder)}
+          onClick={hasChildren ? () => toggleFolder(folder) : undefined}
           isOpen={isOpen}
         />
         <FolderLabelButton
@@ -97,19 +99,32 @@ function Folder({
 
 interface FolderIconButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
-  onClick: MouseEventHandler<HTMLButtonElement>;
   isOpen: boolean;
 }
 
 function FolderIconButton({ isOpen, ...buttonProps }: FolderIconButtonProps) {
-  const Icon = isOpen ? FolderOpenIcon : FolderIcon;
+  const Icon = buttonProps.onClick
+    ? isOpen
+      ? FolderOpenIcon
+      : FolderIcon
+    : FolderOutlineIcon;
 
   return (
-    <button className={c("rounded", "hover:bg-slate-700")} {...buttonProps}>
+    <button
+      className={c(
+        "rounded",
+        buttonProps.onClick ? "hover:bg-slate-700" : "cursor-default"
+      )}
+      {...buttonProps}
+    >
       <Icon
         className={c(
           "mx-2 h-5 w-5 stroke-2",
-          isOpen ? "fill-slate-100" : "fill-slate-400"
+          buttonProps.onClick
+            ? isOpen
+              ? "fill-slate-100"
+              : "fill-slate-400"
+            : "stroke-slate-400"
         )}
       />
     </button>
